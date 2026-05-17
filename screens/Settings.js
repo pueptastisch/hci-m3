@@ -31,6 +31,12 @@ export default function Settings({navigation}) {
           </Text>
         </TouchableOpacity>
 
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('GroupManagement')}>
+          <Text style={styles.itemText}>
+            Group Management
+          </Text>
+        </TouchableOpacity>
+
 
 
         <Text style={styles.sectionTitle}>

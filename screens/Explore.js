@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, TextInput, Button, ScrollView } from 'react-native';
 import Checkbox from 'expo-checkbox';
+import { Picker } from '@react-native-picker/picker';
+import { useFocusEffect } from '@react-navigation/native';
 
 import AppLayout from '../components/AppLayout';
+import { getGroups } from '../data/groupsStore';
 
 // Mock data to get you started
 const dummyRecipes = [
@@ -24,6 +27,33 @@ export default function Explore({ navigation }) {
   const [mealType, setMealType] = useState('');
   const [preferences, setPreferences] = useState('');
   const [includeMyPreferences, setIncludeMyPreferences] = useState(false);
+  const [groups, setGroups] = useState([]);
+  const [selectedGroupId, setSelectedGroupId] = useState('none');
+
+  const loadGroups = useCallback(() => {
+    const nextGroups = getGroups();
+    setGroups(nextGroups);
+
+    if (nextGroups.length === 0) {
+      setSelectedGroupId('none');
+      return;
+    }
+
+    if (selectedGroupId === 'none') {
+      return;
+    }
+
+    const selectedStillExists = nextGroups.some((group) => group.id === selectedGroupId);
+    if (!selectedStillExists) {
+      setSelectedGroupId('none');
+    }
+  }, [selectedGroupId]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadGroups();
+    }, [loadGroups])
+  );
 
   const handleClear = () => {
     setIngredients('');
@@ -34,8 +64,19 @@ export default function Explore({ navigation }) {
   };
 
   const handleGenerate = () => {
+    const selectedGroup = groups.find((group) => group.id === selectedGroupId) || null;
+
     // Generate logic here
-    console.log('Generating with:', { ingredients, includeMyIngredients, mealType, preferences, includeMyPreferences });
+    console.log('Generating with:', {
+      ingredients,
+      includeMyIngredients,
+      mealType,
+      preferences,
+      includeMyPreferences,
+      groupId: selectedGroup ? selectedGroup.id : null,
+      groupName: selectedGroup ? selectedGroup.name : null,
+      groupMembers: selectedGroup ? selectedGroup.members : [],
+    });
   };
 
   const renderRecipeItem = ({ item }) => (
@@ -136,6 +177,28 @@ export default function Explore({ navigation }) {
               <Text style={styles.checkboxLabel}>Include My Preferences</Text>
             </View>
 
+            <Text style={styles.label}>Group For Recipe Generation</Text>
+            <View style={styles.pickerWrapper}>
+              <Picker
+                selectedValue={selectedGroupId}
+                onValueChange={(value) => setSelectedGroupId(value)}
+              >
+                <Picker.Item label="None" value="none" />
+                {groups.map((group) => (
+                  <Picker.Item
+                    key={group.id}
+                    label={`${group.name} (${group.members.length})`}
+                    value={group.id}
+                  />
+                ))}
+              </Picker>
+            </View>
+            {groups.length === 0 ? (
+              <Text style={styles.helperText}>
+                No groups yet. Create one in Settings {'>'} Group Management.
+              </Text>
+            ) : null}
+
             <View style={styles.formActions}>
               <View style={styles.buttonWrapper}>
                 <Button title="Clear" onPress={handleClear} color="#888" />
@@ -211,6 +274,18 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     color: '#333',
+  },
+  pickerWrapper: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    marginTop: 4,
+  },
+  helperText: {
+    marginTop: 6,
+    fontSize: 13,
+    color: '#666',
   },
   checkboxRow: {
     flexDirection: 'row',

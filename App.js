@@ -9,6 +9,7 @@ import MyIngredients from './screens/MyIngredients';
 import SavedRecipes from './screens/SavedRecipes';
 import Settings from './screens/Settings';
 import CookingEquipment from './screens/CookingEquipment';
+import GroupManagement from './screens/GroupManagement';
 const Stack = createNativeStackNavigator();
 export default function App() {
   return (
@@ -50,6 +51,10 @@ export default function App() {
         <Stack.Screen
           name="CookingEquipment"
           component={CookingEquipment}
+        />
+        <Stack.Screen
+          name="GroupManagement"
+          component={GroupManagement}
         />
 
       </Stack.Navigator>
