@@ -2,6 +2,12 @@ import React from 'react';
 import { View, Text, StatusBar,ScrollView, StyleSheet,TouchableOpacity } from 'react-native';
 
 import AppLayout from '../components/AppLayout';
+import {
+  colors,
+  spacing,
+  radii,
+  fontSizes,
+} from '../design/tokens';
 
 
 export default function Settings({navigation}) {
@@ -71,30 +77,30 @@ export default function Settings({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EDEDED',
-    padding: 20,
+    backgroundColor: colors.background,
+    padding: spacing.xl,
   },
 
   sectionTitle: {
-    fontSize: 28,
+    fontSize: fontSizes.display,
     fontWeight: 'bold',
-    marginTop: 20,
-    marginBottom: 15,
-    color: '#000000',
+    marginTop: spacing.xl,
+    marginBottom: spacing.lg - 1,
+    color: colors.textPrimary,
   },
 
   item: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     padding: 18,
-    borderRadius: 12,
-    marginBottom: 15,
+    borderRadius: radii.md,
+    marginBottom: spacing.lg - 1,
 
     borderWidth: 1,
-    borderColor: '#d9d9d9',
+    borderColor: colors.border,
   },
 
   itemText: {
-    fontSize: 22,
-    color: '#000000',
+    fontSize: fontSizes.xxl,
+    color: colors.textPrimary,
   },
 });

@@ -4,6 +4,13 @@ import Checkbox from 'expo-checkbox';
 import { Ionicons } from '@expo/vector-icons';
 
 import AppLayout from '../components/AppLayout';
+import {
+  colors,
+  spacing,
+  radii,
+  fontSizes,
+  fontWeights,
+} from '../design/tokens';
 
 const DUMMY_RECIPE = {
   title: 'Spaghetti Carbonara',
@@ -68,7 +75,7 @@ export default function RecipeDetails() {
               <Ionicons 
                 name={isSaved ? 'bookmark' : 'bookmark-outline'} 
                 size={28} 
-                color={isSaved ? '#34C759' : '#333'} 
+                color={isSaved ? colors.brand : colors.textSecondary} 
               />
             </TouchableOpacity>
           </View>
@@ -106,14 +113,14 @@ export default function RecipeDetails() {
                     <Checkbox
                       value={checkedIngredients[index]}
                       onValueChange={() => toggleIngredient(index)}
-                      color={checkedIngredients[index] ? '#34C759' : undefined}
+                      color={checkedIngredients[index] ? colors.brand : undefined}
                     />
                     <Text style={styles.ingredientText}>{ingredient}</Text>
                   </View>
                 ))}
               </ScrollView>
               <View style={styles.exportButtonContainer}>
-                <Button title="Export List" onPress={() => console.log('Export hit')} color="#34C759" />
+                <Button title="Export List" onPress={() => console.log('Export hit')} color={colors.brand} />
               </View>
             </View>
           ) : (
@@ -132,13 +139,13 @@ export default function RecipeDetails() {
                   title="Previous" 
                   onPress={handlePrevStep} 
                   disabled={currentStepIndex === 0} 
-                  color="#666"
+                  color={colors.textMuted}
                 />
                 <Button 
                   title="Next" 
                   onPress={handleNextStep} 
                   disabled={currentStepIndex === DUMMY_RECIPE.steps.length - 1} 
-                  color="#34C759"
+                  color={colors.brand}
                 />
               </View>
             </View>
@@ -152,70 +159,70 @@ export default function RecipeDetails() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   topSection: {
-    padding: 16,
+    padding: spacing.lg,
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderColor: '#eee',
+    borderColor: colors.borderLight,
   },
   imageContainer: {
     width: '100%',
     position: 'relative',
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   image: {
     width: '100%',
     height: 180,
-    borderRadius: 8,
-    backgroundColor: '#d3d3d3',
+    borderRadius: radii.sm,
+    backgroundColor: colors.placeholder,
   },
   saveIcon: {
     position: 'absolute',
-    bottom: 8,
-    right: 8,
+    bottom: spacing.sm,
+    right: spacing.sm,
     backgroundColor: 'rgba(255,255,255,0.8)',
     borderRadius: 20,
-    padding: 6,
+    padding: spacing.xs + 2,
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#333',
+    fontSize: fontSizes.xxl,
+    fontWeight: fontWeights.bold,
+    marginBottom: spacing.sm,
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   description: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: fontSizes.md,
+    color: colors.textMuted,
     textAlign: 'center',
   },
   tabContainer: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderColor: '#ccc',
+    borderColor: colors.borderLight,
   },
   tabButton: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: spacing.md,
     alignItems: 'center',
   },
   activeTab: {
     borderBottomWidth: 3,
-    borderBottomColor: '#34C759',
+    borderBottomColor: colors.brand,
   },
   tabText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#999',
+    fontSize: fontSizes.lg,
+    fontWeight: fontWeights.semibold,
+    color: colors.textDisabled,
   },
   activeTabText: {
-    color: '#34C759',
+    color: colors.brand,
   },
   bottomSection: {
     flex: 1,
-    padding: 16,
+    padding: spacing.lg,
   },
   ingredientsContainer: {
     flex: 1,
@@ -223,47 +230,47 @@ const styles = StyleSheet.create({
   ingredientRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: spacing.sm + 2,
     borderBottomWidth: 1,
     borderColor: '#f0f0f0',
   },
   ingredientText: {
-    marginLeft: 12,
-    fontSize: 16,
-    color: '#333',
+    marginLeft: spacing.md,
+    fontSize: fontSizes.lg,
+    color: colors.textSecondary,
   },
   exportButtonContainer: {
-    marginTop: 16,
+    marginTop: spacing.lg,
   },
   stepsContainer: {
     flex: 1,
     justifyContent: 'space-between',
   },
   stepIndicator: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#888',
+    fontSize: fontSizes.md,
+    fontWeight: fontWeights.bold,
+    color: colors.textMuted,
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: spacing.sm + 2,
   },
   stepCard: {
     flex: 1,
     justifyContent: 'center',
     backgroundColor: '#f9f9f9',
-    padding: 24,
-    borderRadius: 8,
+    padding: spacing.xxl,
+    borderRadius: radii.sm,
     borderWidth: 1,
     borderColor: '#e0e0e0',
   },
   stepText: {
-    fontSize: 18,
-    color: '#333',
+    fontSize: fontSizes.lg + 2,
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 26,
   },
   stepNavigation: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingTop: 16,
+    paddingTop: spacing.lg,
   },
 });
