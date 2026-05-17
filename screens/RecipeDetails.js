@@ -139,7 +139,7 @@ export default function RecipeDetails() {
                   title="Previous" 
                   onPress={handlePrevStep} 
                   disabled={currentStepIndex === 0} 
-                    color={colors.textMuted}
+                  color={colors.textMuted}
                 />
                 <Button 
                   title="Next" 
