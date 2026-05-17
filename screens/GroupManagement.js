@@ -43,6 +43,7 @@ export default function GroupManagement({ navigation }) {
       return;
     }
 
+    // Keep a valid selected group after create/delete operations.
     const selectedStillExists = nextGroups.some((group) => group.id === selectedGroupId);
     if (!selectedStillExists) {
       setSelectedGroupId(nextGroups[0].id);
@@ -83,6 +84,7 @@ export default function GroupManagement({ navigation }) {
       return;
     }
 
+    // Validate against the mocked local user directory.
     if (!userExists(username)) {
       setError('That username does not exist in the local users list.');
       return;
@@ -121,6 +123,7 @@ export default function GroupManagement({ navigation }) {
       return;
     }
 
+    // Reload picks the next available group (or clears selection if none remain).
     setSuccess(`Deleted group "${result.deletedGroup.name}".`);
     loadGroups();
   };
@@ -154,6 +157,7 @@ export default function GroupManagement({ navigation }) {
                 key={group.id}
                 style={[styles.groupItem, selected && styles.groupItemSelected]}
                 onPress={() => {
+                  // Changing group context should clear stale success/error messages.
                   clearMessages();
                   setSelectedGroupId(group.id);
                 }}

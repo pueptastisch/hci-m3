@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, TextInput, Button, ScrollView } from 'react-native';
 import Checkbox from 'expo-checkbox';
-import { Picker } from '@react-native-picker/picker';
 import { useFocusEffect } from '@react-navigation/native';
 
 import AppLayout from '../components/AppLayout';
@@ -37,6 +36,7 @@ export default function Explore({ navigation }) {
   const [includeMyPreferences, setIncludeMyPreferences] = useState(false);
   const [groups, setGroups] = useState([]);
   const [selectedGroupId, setSelectedGroupId] = useState('none');
+  const [isGroupDropdownOpen, setIsGroupDropdownOpen] = useState(false);
 
   const loadGroups = useCallback(() => {
     const nextGroups = getGroups();
@@ -51,6 +51,7 @@ export default function Explore({ navigation }) {
       return;
     }
 
+    // Keep selection valid after returning from Group Management.
     const selectedStillExists = nextGroups.some((group) => group.id === selectedGroupId);
     if (!selectedStillExists) {
       setSelectedGroupId('none');
@@ -69,6 +70,8 @@ export default function Explore({ navigation }) {
     setMealType('');
     setPreferences('');
     setIncludeMyPreferences(false);
+    // Reset UI state as well as form values.
+    setIsGroupDropdownOpen(false);
   };
 
   const handleGenerate = () => {
@@ -82,6 +85,7 @@ export default function Explore({ navigation }) {
       .map((item) => item.trim())
       .filter(Boolean);
 
+    // Merge manual preferences with group-derived preferences, deduping case-insensitively.
     const mergedPreferences = [...manualPreferences];
     groupDietaryPreferences.forEach((groupPreference) => {
       const alreadyIncluded = mergedPreferences.some(
@@ -94,6 +98,7 @@ export default function Explore({ navigation }) {
 
     const finalPreferences = mergedPreferences.join(', ');
     if (finalPreferences !== preferences) {
+      // Show users the final preferences that will be used for generation.
       setPreferences(finalPreferences);
     }
 
@@ -112,6 +117,9 @@ export default function Explore({ navigation }) {
   };
 
   const selectedGroup = groups.find((group) => group.id === selectedGroupId) || null;
+  const selectedGroupLabel = selectedGroup
+    ? `${selectedGroup.name} (${selectedGroup.members.length})`
+    : 'None';
   const selectedGroupDietaryPreferences = selectedGroup
     ? getDietaryPreferencesForUsernames(selectedGroup.members)
     : [];
@@ -215,20 +223,45 @@ export default function Explore({ navigation }) {
             </View>
 
             <Text style={styles.label}>Group For Recipe Generation</Text>
-            <View style={styles.pickerWrapper}>
-              <Picker
-                selectedValue={selectedGroupId}
-                onValueChange={(value) => setSelectedGroupId(value)}
+            <View style={styles.dropdownContainer}>
+              {/* Custom dropdown keeps this control visually aligned with token-styled inputs. */}
+              <TouchableOpacity
+                style={styles.dropdownTrigger}
+                onPress={() => setIsGroupDropdownOpen((previous) => !previous)}
+                activeOpacity={0.8}
               >
-                <Picker.Item label="None" value="none" />
-                {groups.map((group) => (
-                  <Picker.Item
-                    key={group.id}
-                    label={`${group.name} (${group.members.length})`}
-                    value={group.id}
-                  />
-                ))}
-              </Picker>
+                <Text style={styles.dropdownTriggerText}>{selectedGroupLabel}</Text>
+                <Text style={styles.dropdownChevron}>{isGroupDropdownOpen ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+
+              {isGroupDropdownOpen ? (
+                <View style={styles.dropdownMenu}>
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setSelectedGroupId('none');
+                      setIsGroupDropdownOpen(false);
+                    }}
+                  >
+                    <Text style={styles.dropdownItemText}>None</Text>
+                  </TouchableOpacity>
+
+                  {groups.map((group) => (
+                    <TouchableOpacity
+                      key={group.id}
+                      style={styles.dropdownItem}
+                      onPress={() => {
+                        setSelectedGroupId(group.id);
+                        setIsGroupDropdownOpen(false);
+                      }}
+                    >
+                      <Text style={styles.dropdownItemText}>
+                        {group.name} ({group.members.length})
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              ) : null}
             </View>
             {groups.length === 0 ? (
               <Text style={styles.helperText}>
@@ -317,12 +350,47 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.lg,
     color: colors.textSecondary,
   },
-  pickerWrapper: {
+  dropdownContainer: {
+    marginTop: 4,
+  },
+  dropdownTrigger: {
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.borderLight,
     borderRadius: radii.sm,
-    marginTop: 4,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  dropdownTriggerText: {
+    flex: 1,
+    fontSize: fontSizes.lg,
+    color: colors.textSecondary,
+  },
+  dropdownChevron: {
+    marginLeft: spacing.sm,
+    fontSize: fontSizes.sm,
+    color: colors.textMuted,
+  },
+  dropdownMenu: {
+    marginTop: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+    borderRadius: radii.sm,
+    backgroundColor: colors.surface,
+    overflow: 'hidden',
+  },
+  dropdownItem: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  dropdownItemText: {
+    fontSize: fontSizes.lg,
+    color: colors.textSecondary,
   },
   helperText: {
     marginTop: 6,

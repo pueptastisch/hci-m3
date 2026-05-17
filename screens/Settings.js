@@ -10,6 +10,9 @@ import {
 } from '../design/tokens';
 
 
+//settings page to navigate to the different subpages (dietary preferences, allergies, cooking equipment, 
+// group management, payment info, subscription, log out)
+
 export default function Settings({navigation}) {
   return (
     <AppLayout>

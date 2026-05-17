@@ -21,6 +21,9 @@ import {
 
 const { height } = Dimensions.get('window');
 
+
+// simple page with checkboxes for the user to select their dietary preferences
+
 export default function DietaryPrefrences({ navigation, route }) {
   
   const [selected, setSelected] = useState([]);

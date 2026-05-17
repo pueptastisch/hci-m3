@@ -11,6 +11,8 @@ import {
   fontWeights,
 } from '../design/tokens';
 
+// page to show the recipes the user has saved, with a delete button on each recipe card
+
 export default function SavedRecipes({ navigation }) {
   const [savedRecipes, setSavedRecipes] = useState([
     {

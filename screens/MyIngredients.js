@@ -19,6 +19,9 @@ import {
   fontWeights,
 } from '../design/tokens';
 
+
+// simple page with for the user to add the ingredients they have at home
+
 export default function MyIngredients() {
 
   const [popupVisible, setPopupVisible] = useState(false);

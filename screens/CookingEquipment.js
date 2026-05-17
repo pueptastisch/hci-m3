@@ -20,6 +20,9 @@ import {
 
 const { height } = Dimensions.get('window');
 
+
+// simple page with checkboxes for the user to select their cooking equipment they have at home
+
 export default function CookingEquipment({ navigation }) {
 
   const [selected, setSelected] = useState([]);
