@@ -11,7 +11,13 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import AppLayout from '../components/AppLayout';
 import { AVAILABLE_USERNAMES, userExists } from '../data/users';
-import { getGroups, createGroup, addMemberToGroup } from '../data/groupsStore';
+import {
+  getGroups,
+  createGroup,
+  addMemberToGroup,
+  removeMemberFromGroup,
+  deleteGroup,
+} from '../data/groupsStore';
 
 export default function GroupManagement() {
   const [groups, setGroups] = useState([]);
@@ -86,6 +92,32 @@ export default function GroupManagement() {
     loadGroups();
   };
 
+  const handleRemoveUser = (member) => {
+    clearMessages();
+
+    const result = removeMemberFromGroup(selectedGroupId, member);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+
+    setSuccess(`Removed ${member} from ${result.group.name}.`);
+    loadGroups();
+  };
+
+  const handleDeleteGroup = () => {
+    clearMessages();
+
+    const result = deleteGroup(selectedGroupId);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+
+    setSuccess(`Deleted group "${result.deletedGroup.name}".`);
+    loadGroups();
+  };
+
   const selectedGroup = groups.find((group) => group.id === selectedGroupId) || null;
 
   return (
@@ -142,15 +174,27 @@ export default function GroupManagement() {
         </TouchableOpacity>
 
         {selectedGroup ? (
+          <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteGroup}>
+            <Text style={styles.deleteButtonText}>Delete Selected Group</Text>
+          </TouchableOpacity>
+        ) : null}
+
+        {selectedGroup ? (
           <View style={styles.membersBlock}>
             <Text style={styles.sectionTitle}>Members In {selectedGroup.name}</Text>
             {selectedGroup.members.length === 0 ? (
               <Text style={styles.helperText}>No members yet.</Text>
             ) : (
               selectedGroup.members.map((member) => (
-                <Text key={`${selectedGroup.id}-${member}`} style={styles.memberItem}>
-                  • {member}
-                </Text>
+                <View key={`${selectedGroup.id}-${member}`} style={styles.memberRow}>
+                  <Text style={styles.memberItem}>• {member}</Text>
+                  <TouchableOpacity
+                    style={styles.memberDeleteButton}
+                    onPress={() => handleRemoveUser(member)}
+                  >
+                    <Text style={styles.memberDeleteButtonText}>Remove</Text>
+                  </TouchableOpacity>
+                </View>
               ))
             )}
           </View>
@@ -212,6 +256,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
+  deleteButton: {
+    backgroundColor: '#f8d7da',
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 2,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#d9534f',
+  },
+  deleteButtonText: {
+    color: '#a72824',
+    fontSize: 16,
+    fontWeight: '700',
+  },
   groupItem: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
@@ -237,10 +296,28 @@ const styles = StyleSheet.create({
   membersBlock: {
     marginTop: 10,
   },
+  memberRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
   memberItem: {
     fontSize: 16,
     color: '#222222',
-    marginBottom: 6,
+  },
+  memberDeleteButton: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#d9534f',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  memberDeleteButtonText: {
+    color: '#a72824',
+    fontSize: 13,
+    fontWeight: '700',
   },
   errorText: {
     marginTop: 14,
