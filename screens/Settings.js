@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StatusBar,ScrollView, StyleSheet,TouchableOpacity } from 'react-native';
 
-import AppLayout from './components/AppLayout';
+import AppLayout from '../components/AppLayout';
 
 
 export default function Settings({navigation}) {

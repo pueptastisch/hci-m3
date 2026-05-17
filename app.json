@@ -1,4 +1,18 @@
 {
-  "name": "Recipy",
-  "displayName": "Recipy"
+  "expo": {
+    "name": "Recipy",
+    "slug": "recipy",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      }
+    }
+  }
 }

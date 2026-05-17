@@ -10,7 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 
-import AppLayout from './components/AppLayout';
+import AppLayout from '../components/AppLayout';
 
 export default function MyIngredients() {
 
@@ -29,12 +29,12 @@ export default function MyIngredients() {
       />
 
       <View style={styles.topRow}>
-
+        <Text style={styles.headerTitle}>My Ingredients</Text>
         <TouchableOpacity
           onPress={() => setPopupVisible(true)}
         >
           <Image
-            source={require('./assets/Add.png')}
+            source={require('../assets/Add.png')}
             style={styles.addIcon}
           />
         </TouchableOpacity>
@@ -60,7 +60,7 @@ export default function MyIngredients() {
             >
 
               <Image
-                source={require('./assets/X.png')}
+                source={require('../assets/X.png')}
                 style={styles.deleteIcon}
               />
 
@@ -128,9 +128,18 @@ export default function MyIngredients() {
 const styles = StyleSheet.create({
 
   topRow: {
-    alignItems: 'flex-end',
-    paddingRight: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
     paddingTop: 20,
+    paddingBottom: 10,
+  },
+
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
   },
 
   addIcon: {
