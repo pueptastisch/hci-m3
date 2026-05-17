@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Button } from 'react-native';
 import Checkbox from 'expo-checkbox';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,10 +11,13 @@ import {
   fontSizes,
   fontWeights,
 } from '../design/tokens';
+import { AppContext } from '../context/AppContext';
 
 const DUMMY_RECIPE = {
+  id: '1',
   title: 'Spaghetti Carbonara',
   description: 'A classic Italian pasta dish made with egg, hard cheese, cured pork, and black pepper.',
+  difficulty: '2/5',
   image: 'https://img.chefkoch-cdn.de/rezepte/1298241234947062/bilder/1616493/crop-640x427/carbonara-wie-bei-der-mamma-in-rom.jpg',
   ingredients: [
     '200g Spaghetti',
@@ -36,7 +39,17 @@ const DUMMY_RECIPE = {
 export default function RecipeDetails() {
   const [activeTab, setActiveTab] = useState('Ingredients');
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isSaved, setIsSaved] = useState(false);
+  const { savedRecipes, setSavedRecipes } = useContext(AppContext);
+  
+  const isSaved = savedRecipes.some(recipe => recipe.id === DUMMY_RECIPE.id);
+
+  const toggleSave = () => {
+    if (isSaved) {
+      setSavedRecipes(savedRecipes.filter(r => r.id !== DUMMY_RECIPE.id));
+    } else {
+      setSavedRecipes([...savedRecipes, DUMMY_RECIPE]);
+    }
+  };
   
   // Keep track of which ingredients are checked
   const [checkedIngredients, setCheckedIngredients] = useState(
@@ -70,7 +83,7 @@ export default function RecipeDetails() {
             <Image source={{ uri: DUMMY_RECIPE.image }} style={styles.image} />
             <TouchableOpacity 
               style={styles.saveIcon} 
-              onPress={() => setIsSaved(!isSaved)}
+              onPress={toggleSave}
             >
               <Ionicons 
                 name={isSaved ? 'bookmark' : 'bookmark-outline'} 

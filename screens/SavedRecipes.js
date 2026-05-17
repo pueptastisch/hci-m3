@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -10,19 +10,12 @@ import {
   fontSizes,
   fontWeights,
 } from '../design/tokens';
+import { AppContext } from '../context/AppContext';
 
 // page to show the recipes the user has saved, with a delete button on each recipe card
 
 export default function SavedRecipes({ navigation }) {
-  const [savedRecipes, setSavedRecipes] = useState([
-    {
-      id: '1',
-      title: 'Spaghetti Carbonara',
-      description: 'A classic Italian pasta dish made with egg, hard cheese, cured pork, and black pepper.',
-      difficulty: '2/5',
-      image: 'https://img.chefkoch-cdn.de/rezepte/1298241234947062/bilder/1616493/crop-640x427/carbonara-wie-bei-der-mamma-in-rom.jpg',
-    }
-  ]);
+  const { savedRecipes, setSavedRecipes } = useContext(AppContext);
 
   const handleDelete = (id) => {
     setSavedRecipes(savedRecipes.filter(recipe => recipe.id !== id));

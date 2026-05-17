@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import {
   fontSizes,
   fontWeights,
 } from '../design/tokens';
+import { AppContext } from '../context/AppContext';
 
 
 // simple page with for the user to add the ingredients they have at home
@@ -28,7 +29,7 @@ export default function MyIngredients() {
 
   const [ingredient, setIngredient] = useState('');
 
-  const [ingredients, setIngredients] = useState([]);
+  const { myIngredients: ingredients, setMyIngredients: setIngredients } = useContext(AppContext);
 
   return (
     <AppLayout>

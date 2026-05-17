@@ -10,16 +10,18 @@ import SavedRecipes from './screens/SavedRecipes';
 import Settings from './screens/Settings';
 import CookingEquipment from './screens/CookingEquipment';
 import GroupManagement from './screens/GroupManagement';
+import { AppProvider } from './context/AppContext';
 const Stack = createNativeStackNavigator();
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="DietaryPreferences"
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
+    <AppProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="DietaryPreferences"
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
         <Stack.Screen
           name="DietaryPreferences"
           component={DietaryPreferences}
@@ -59,5 +61,6 @@ export default function App() {
 
       </Stack.Navigator>
     </NavigationContainer>
+    </AppProvider>
   );
 }

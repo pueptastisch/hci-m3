@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import {
   fontSizes,
   fontWeights,
 } from '../design/tokens';
-
+import { AppContext } from '../context/AppContext';
 
 const { height } = Dimensions.get('window');
 
@@ -26,7 +26,7 @@ const { height } = Dimensions.get('window');
 
 export default function DietaryPrefrences({ navigation, route }) {
   
-  const [selected, setSelected] = useState([]);
+  const { dietaryPreferences: selected, setDietaryPreferences: setSelected } = useContext(AppContext);
 
   const options = [
     'Vegetarian',
