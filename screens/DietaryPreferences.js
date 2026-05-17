@@ -10,6 +10,14 @@ import {
 } from 'react-native';
 import Checkbox from 'expo-checkbox';
 
+import {
+  colors,
+  spacing,
+  radii,
+  fontSizes,
+  fontWeights,
+} from '../design/tokens';
+
 
 const { height } = Dimensions.get('window');
 
@@ -33,7 +41,7 @@ export default function DietaryPrefrences({ navigation, route }) {
   return (
     
     <View style={styles.screen}>
-      <StatusBar barStyle="dark-content" backgroundColor="#EDEDED" />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
       <View style={styles.container}>
         <Text style={styles.logo}>
           Dietary Preferences
@@ -103,21 +111,21 @@ export default function DietaryPrefrences({ navigation, route }) {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#EDEDED',
+    backgroundColor: colors.background,
   },
 
   container: {
     height: height * (2 / 12),
-    backgroundColor: '#EDEDED',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#c0bfbf',
+    borderBottomColor: colors.borderMuted,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   logo: {
-    fontSize: 40,
-    color: '#34C759',
+    fontSize: fontSizes.brand,
+    color: colors.brand,
     fontFamily: 'Jaini',
   },
   content: {
@@ -130,22 +138,23 @@ const styles = StyleSheet.create({
   },
 
   descriptionText: {
-    color: '#000000',
-    marginTop: 20,
-    marginBottom: 40,
-    fontSize: 25,
+    color: colors.textPrimary,
+    marginTop: spacing.xl,
+    marginBottom: spacing.xxxl + 10,
+    fontSize: fontSizes.xxxl,
     textAlign: 'center',
   },
 
   options: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 15,
-    marginBottom: 20,
+    marginLeft: spacing.lg - 1,
+    marginBottom: spacing.xl,
     },
   optionstext: {
-    color: '#000000',
-    fontSize: 26,
+    color: colors.textPrimary,
+    fontSize: fontSizes.xxxl,
+    marginLeft: spacing.sm + 2,
   },
 
   bottomSection: {
@@ -164,10 +173,10 @@ const styles = StyleSheet.create({
 
     backgroundColor: '#CFF7D3',
 
-    borderColor: '#34C759',
+    borderColor: colors.brand,
     
-    borderRadius: 12,
-    marginBottom: 40,
+    borderRadius: radii.md,
+    marginBottom: spacing.xxxl + 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -176,23 +185,23 @@ const styles = StyleSheet.create({
     width: 190,
     height: 70,
 
-    backgroundColor: '#34C759',
+    backgroundColor: colors.brand,
 
-    borderRadius: 12,
-    marginBottom: 40,
+    borderRadius: radii.md,
+    marginBottom: spacing.xxxl + 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   leftButtonText: {
-    color: '#000000',
-    fontSize: 20,
-    fontWeight: 'bold',
+    color: colors.textPrimary,
+    fontSize: fontSizes.xl,
+    fontWeight: fontWeights.bold,
   },
 
   rightButtonText: {
-    color: '#000000',
-    fontSize: 20,
-    fontWeight: 'bold',
+    color: colors.textPrimary,
+    fontSize: fontSizes.xl,
+    fontWeight: fontWeights.bold,
   },
 });

@@ -11,6 +11,13 @@ import {
 } from 'react-native';
 
 import AppLayout from '../components/AppLayout';
+import {
+  colors,
+  spacing,
+  radii,
+  fontSizes,
+  fontWeights,
+} from '../design/tokens';
 
 export default function MyIngredients() {
 
@@ -25,7 +32,7 @@ export default function MyIngredients() {
 
       <StatusBar
         barStyle="dark-content"
-        backgroundColor="#EDEDED"
+        backgroundColor={colors.background}
       />
 
       <View style={styles.topRow}>
@@ -131,15 +138,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.sm + 2,
   },
 
   headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: fontSizes.xxxl,
+    fontWeight: fontWeights.bold,
+    color: colors.textSecondary,
   },
 
   addIcon: {
@@ -150,13 +157,13 @@ const styles = StyleSheet.create({
 
   ingredientsContainer: {
     flex: 1,
-    padding: 20,
+    padding: spacing.xl,
   },
 
   ingredientText: {
-    fontSize: 28,
-    marginBottom: 15,
-    color: '#000000',
+    fontSize: fontSizes.xxxl,
+    marginBottom: spacing.lg - 1,
+    color: colors.textPrimary,
   },
 
   popup: {
@@ -166,27 +173,27 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
 
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
 
-    padding: 20,
+    padding: spacing.xl,
 
     borderRadius: 20,
 
     borderWidth: 1,
-    borderColor: '#d9d9d9',
+    borderColor: colors.border,
   },
 
   input: {
     borderWidth: 1,
-    borderColor: '#c0bfbf',
+    borderColor: colors.borderMuted,
 
-    borderRadius: 10,
+    borderRadius: radii.sm + 2,
 
-    padding: 15,
+    padding: spacing.md + 3,
 
-    fontSize: 22,
+    fontSize: fontSizes.xl + 2,
 
-    marginBottom: 20,
+    marginBottom: spacing.xl,
   },
 
   popupButtons: {
@@ -197,35 +204,35 @@ const styles = StyleSheet.create({
   backButton: {
     backgroundColor: '#CFF7D3',
 
-    paddingVertical: 12,
-    paddingHorizontal: 50,
+    paddingVertical: spacing.sm + 4,
+    paddingHorizontal: spacing.xl + 30,
 
-    borderRadius: 12,
+    borderRadius: radii.md,
 
     borderWidth: 1,
-    borderColor: '#34C759',
+    borderColor: colors.brand,
   },
 
   addButton: {
-    backgroundColor: '#34C759',
+    backgroundColor: colors.brand,
 
-    paddingVertical: 12,
-    paddingHorizontal: 50,
+    paddingVertical: spacing.sm + 4,
+    paddingHorizontal: spacing.xl + 30,
 
-    borderRadius: 12,
+    borderRadius: radii.md,
   },
 
   buttonText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000000',
+    fontSize: fontSizes.xl,
+    fontWeight: fontWeights.bold,
+    color: colors.textPrimary,
   },
   ingredientRow: {
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
 
-  marginBottom: 15,
+  marginBottom: spacing.lg - 1,
 },
 
   deleteIcon: {

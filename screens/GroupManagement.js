@@ -12,6 +12,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import AppLayout from '../components/AppLayout';
 import { AVAILABLE_USERNAMES, userExists } from '../data/users';
 import {
+  colors,
+  spacing,
+  radii,
+  fontSizes,
+  fontWeights,
+} from '../design/tokens';
+import {
   getGroups,
   createGroup,
   addMemberToGroup,
@@ -19,7 +26,7 @@ import {
   deleteGroup,
 } from '../data/groupsStore';
 
-export default function GroupManagement() {
+export default function GroupManagement({ navigation }) {
   const [groups, setGroups] = useState([]);
   const [groupName, setGroupName] = useState('');
   const [selectedGroupId, setSelectedGroupId] = useState('');
@@ -159,9 +166,6 @@ export default function GroupManagement() {
         )}
 
         <Text style={styles.sectionTitle}>Add User To Selected Group</Text>
-        <Text style={styles.helperText}>
-          Existing usernames: {AVAILABLE_USERNAMES.join(', ')}
-        </Text>
         <TextInput
           style={styles.input}
           placeholder="Username"
@@ -172,12 +176,6 @@ export default function GroupManagement() {
         <TouchableOpacity style={styles.primaryButton} onPress={handleAddUser}>
           <Text style={styles.primaryButtonText}>Add User</Text>
         </TouchableOpacity>
-
-        {selectedGroup ? (
-          <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteGroup}>
-            <Text style={styles.deleteButtonText}>Delete Selected Group</Text>
-          </TouchableOpacity>
-        ) : null}
 
         {selectedGroup ? (
           <View style={styles.membersBlock}>
@@ -200,6 +198,12 @@ export default function GroupManagement() {
           </View>
         ) : null}
 
+        {selectedGroup ? (
+          <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteGroup}>
+            <Text style={styles.deleteButtonText}>Delete Selected Group</Text>
+          </TouchableOpacity>
+        ) : null}
+
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
         {success ? <Text style={styles.successText}>{success}</Text> : null}
       </ScrollView>
@@ -210,123 +214,124 @@ export default function GroupManagement() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EDEDED',
+    backgroundColor: colors.background,
   },
   content: {
-    padding: 20,
-    paddingBottom: 30,
+    padding: spacing.xl,
+    paddingBottom: spacing.xxxl,
   },
   header: {
-    fontSize: 28,
+    fontSize: fontSizes.display,
     fontWeight: 'bold',
-    color: '#000000',
-    marginBottom: 16,
+    color: colors.textPrimary,
+    textAlign: 'center',
+    marginBottom: spacing.lg,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#000000',
-    marginBottom: 10,
-    marginTop: 12,
+    fontSize: fontSizes.xl,
+    fontWeight: fontWeights.bold,
+    color: colors.textPrimary,
+    marginBottom: spacing.sm + 2,
+    marginTop: spacing.md,
   },
   helperText: {
-    fontSize: 14,
-    color: '#555555',
-    marginBottom: 8,
+    fontSize: fontSizes.md,
+    color: colors.textMuted,
+    marginBottom: spacing.sm,
   },
   input: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#d9d9d9',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    marginBottom: 10,
+    borderColor: colors.border,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.sm + 6,
+    paddingVertical: spacing.md,
+    fontSize: fontSizes.lg,
+    marginBottom: spacing.sm + 2,
   },
   primaryButton: {
-    backgroundColor: '#34C759',
-    borderRadius: 12,
-    paddingVertical: 12,
+    backgroundColor: colors.brand,
+    borderRadius: radii.md,
+    paddingVertical: spacing.md,
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   primaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
+    color: colors.surface,
+    fontSize: fontSizes.lg,
+    fontWeight: fontWeights.bold,
   },
   deleteButton: {
-    backgroundColor: '#f8d7da',
-    borderRadius: 12,
-    paddingVertical: 12,
+    backgroundColor: colors.dangerBg,
+    borderRadius: radii.md,
+    paddingVertical: spacing.md,
     alignItems: 'center',
     marginTop: 2,
-    marginBottom: 8,
+    marginBottom: spacing.sm,
     borderWidth: 1,
-    borderColor: '#d9534f',
+    borderColor: colors.danger,
   },
   deleteButtonText: {
-    color: '#a72824',
-    fontSize: 16,
-    fontWeight: '700',
+    color: colors.dangerText,
+    fontSize: fontSizes.lg,
+    fontWeight: fontWeights.bold,
   },
   groupItem: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#d9d9d9',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 8,
+    borderColor: colors.border,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
   },
   groupItemSelected: {
-    borderColor: '#34C759',
+    borderColor: colors.brand,
     borderWidth: 2,
   },
   groupName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#000000',
+    fontSize: fontSizes.lg,
+    fontWeight: fontWeights.bold,
+    color: colors.textPrimary,
   },
   groupMeta: {
-    marginTop: 4,
-    fontSize: 13,
-    color: '#666666',
+    marginTop: spacing.xs,
+    fontSize: fontSizes.sm,
+    color: colors.textMuted,
   },
   membersBlock: {
-    marginTop: 10,
+    marginTop: spacing.sm + 2,
   },
   memberRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    marginBottom: spacing.sm - 2,
   },
   memberItem: {
-    fontSize: 16,
-    color: '#222222',
+    fontSize: fontSizes.lg,
+    color: colors.textSecondary,
   },
   memberDeleteButton: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#d9534f',
-    borderRadius: 8,
-    paddingHorizontal: 10,
+    borderColor: colors.danger,
+    borderRadius: radii.sm,
+    paddingHorizontal: spacing.sm + 2,
     paddingVertical: 5,
   },
   memberDeleteButtonText: {
-    color: '#a72824',
-    fontSize: 13,
-    fontWeight: '700',
+    color: colors.dangerText,
+    fontSize: fontSizes.sm,
+    fontWeight: fontWeights.bold,
   },
   errorText: {
-    marginTop: 14,
-    color: '#d23232',
-    fontWeight: '600',
+    marginTop: spacing.md + 2,
+    color: colors.error,
+    fontWeight: fontWeights.semibold,
   },
   successText: {
-    marginTop: 10,
-    color: '#1f8d3d',
-    fontWeight: '600',
+    marginTop: spacing.sm + 2,
+    color: colors.success,
+    fontWeight: fontWeights.semibold,
   },
 });

@@ -2,13 +2,11 @@ import React from 'react';
 import {
   View,
   StyleSheet,
-  Dimensions,
 } from 'react-native';
 
 import TopBar from './TopBar';
 import BottomNav from './BottomNav';
-
-const { height } = Dimensions.get('window');
+import { colors } from '../design/tokens';
 
 export default function AppLayout({ children }) {
   return (
@@ -29,7 +27,7 @@ export default function AppLayout({ children }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EDEDED',
+    backgroundColor: colors.background,
   },
 
   content: {

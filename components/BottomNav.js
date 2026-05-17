@@ -7,6 +7,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { useNavigation , useNavigationState  } from '@react-navigation/native';
+import { colors } from '../design/tokens';
 
 
 
@@ -74,10 +75,10 @@ export default function BottomNav() {
 const styles = StyleSheet.create({
   container: {
     height: height * (1.5 / 12),
-    backgroundColor: '#EDEDED',
+    backgroundColor: colors.background,
 
     borderTopWidth: 1,
-    borderTopColor: '#c0bfbf',
+    borderTopColor: colors.borderMuted,
 
     flexDirection: 'row',
     justifyContent: 'space-evenly',

@@ -6,6 +6,7 @@ import {
   Dimensions,
   StatusBar,
 } from 'react-native';
+import { colors, fontSizes } from '../design/tokens';
 
 const { height } = Dimensions.get('window');
 
@@ -13,7 +14,7 @@ export default function TopBar() {
   return (
     
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#EDEDED" />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
       <Text style={styles.logo}>
         Recipy
       </Text>
@@ -24,16 +25,16 @@ export default function TopBar() {
 const styles = StyleSheet.create({
   container: {
     height: height * (2 / 12),
-    backgroundColor: '#EDEDED',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#c0bfbf',
+    borderBottomColor: colors.borderMuted,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   logo: {
-    fontSize: 40,
-    color: '#34C759',
+    fontSize: fontSizes.brand,
+    color: colors.brand,
     fontFamily: 'Jaini-Regular'
   },
 });

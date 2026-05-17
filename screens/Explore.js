@@ -7,6 +7,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import AppLayout from '../components/AppLayout';
 import { getGroups } from '../data/groupsStore';
 import { getDietaryPreferencesForUsernames } from '../data/users';
+import {
+  colors,
+  spacing,
+  radii,
+  fontSizes,
+  fontWeights,
+} from '../design/tokens';
 
 // Mock data to get you started
 const dummyRecipes = [
@@ -175,7 +182,7 @@ export default function Explore({ navigation }) {
               <Checkbox
                 value={includeMyIngredients}
                 onValueChange={setIncludeMyIngredients}
-                color={includeMyIngredients ? '#34C759' : undefined}
+                color={includeMyIngredients ? colors.brand : undefined}
               />
               <Text style={styles.checkboxLabel}>Include My Ingredients</Text>
             </View>
@@ -202,7 +209,7 @@ export default function Explore({ navigation }) {
               <Checkbox
                 value={includeMyPreferences}
                 onValueChange={setIncludeMyPreferences}
-                color={includeMyPreferences ? '#34C759' : undefined}
+                color={includeMyPreferences ? colors.brand : undefined}
               />
               <Text style={styles.checkboxLabel}>Include My Preferences</Text>
             </View>
@@ -236,10 +243,10 @@ export default function Explore({ navigation }) {
 
             <View style={styles.formActions}>
               <View style={styles.buttonWrapper}>
-                <Button title="Clear" onPress={handleClear} color="#888" />
+                <Button title="Clear" onPress={handleClear} color={colors.textDisabled} />
               </View>
               <View style={styles.buttonWrapper}>
-                <Button title="Generate Recipe" onPress={handleGenerate} color="#34C759" />
+                <Button title="Generate Recipe" onPress={handleGenerate} color={colors.brand} />
               </View>
             </View>
           </ScrollView>
@@ -252,13 +259,13 @@ export default function Explore({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAF9F6', // optional background color
+    backgroundColor: colors.backgroundWarm,
   },
   tabContainer: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#fff',
+    borderColor: colors.borderLight,
+    backgroundColor: colors.surface,
   },
   tabButton: {
     flex: 1,
@@ -267,71 +274,71 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 3,
-    borderBottomColor: '#34C759',
+    borderBottomColor: colors.brand,
   },
   tabText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#999',
+    fontSize: fontSizes.lg,
+    fontWeight: fontWeights.semibold,
+    color: colors.textDisabled,
   },
   activeTabText: {
-    color: '#34C759',
+    color: colors.brand,
   },
   contentContainer: {
     flex: 1,
   },
   header: {
-    fontSize: 24,
+    fontSize: fontSizes.xxxl,
     fontWeight: 'bold',
-    margin: 16,
-    color: '#333',
+    margin: spacing.lg,
+    color: colors.textSecondary,
   },
   listContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
   },
   formContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 30,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xxxl,
   },
   label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontSize: fontSizes.lg,
+    fontWeight: fontWeights.semibold,
+    color: colors.textSecondary,
     marginBottom: 6,
-    marginTop: 12,
+    marginTop: spacing.md,
   },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    color: '#333',
+    borderColor: colors.borderLight,
+    borderRadius: radii.sm,
+    padding: spacing.md,
+    fontSize: fontSizes.lg,
+    color: colors.textSecondary,
   },
   pickerWrapper: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
+    borderColor: colors.borderLight,
+    borderRadius: radii.sm,
     marginTop: 4,
   },
   helperText: {
     marginTop: 6,
-    fontSize: 13,
-    color: '#666',
+    fontSize: fontSizes.sm,
+    color: colors.textMuted,
   },
   checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: spacing.md,
     marginBottom: 6,
   },
   checkboxLabel: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: '#333',
+    marginLeft: spacing.sm + 2,
+    fontSize: fontSizes.lg,
+    color: colors.textSecondary,
   },
   textArea: {
     height: 80,
@@ -340,20 +347,19 @@ const styles = StyleSheet.create({
   formActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 24,
+    marginTop: spacing.xxl,
   },
   buttonWrapper: {
-    flex: 0.48, // Allows buttons to sit side-by-side easily
+    flex: 0.48,
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-    // Shadows for a card effect
+    backgroundColor: colors.surface,
+    borderRadius: radii.sm,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
     elevation: 2, 
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
@@ -361,28 +367,28 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: 80,
     height: 80,
-    borderRadius: 8,
-    backgroundColor: '#d3d3d3',
+    borderRadius: radii.sm,
+    backgroundColor: colors.placeholder,
   },
   textContainer: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: spacing.md,
     justifyContent: 'center',
   },
   title: {
-    fontSize: 16,
+    fontSize: fontSizes.lg,
     fontWeight: 'bold',
     marginBottom: 4,
-    color: '#333',
+    color: colors.textSecondary,
   },
   description: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: fontSizes.md,
+    color: colors.textMuted,
     marginBottom: 8,
   },
   difficulty: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#000000',
+    fontSize: fontSizes.xs,
+    fontWeight: fontWeights.semibold,
+    color: colors.textPrimary,
   },
 });

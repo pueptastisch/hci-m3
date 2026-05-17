@@ -3,6 +3,13 @@ import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react
 import { Ionicons } from '@expo/vector-icons';
 
 import AppLayout from '../components/AppLayout';
+import {
+  colors,
+  spacing,
+  radii,
+  fontSizes,
+  fontWeights,
+} from '../design/tokens';
 
 export default function SavedRecipes({ navigation }) {
   const [savedRecipes, setSavedRecipes] = useState([
@@ -65,28 +72,28 @@ export default function SavedRecipes({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAF9F6',
+    backgroundColor: colors.backgroundWarm,
   },
   header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginHorizontal: 20,
-    marginTop: 20,
-    marginBottom: 16,
+    fontSize: fontSizes.xxxl,
+    fontWeight: fontWeights.bold,
+    color: colors.textSecondary,
+    marginHorizontal: spacing.xl,
+    marginTop: spacing.xl,
+    marginBottom: spacing.lg,
   },
   listContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
+    backgroundColor: colors.surface,
+    borderRadius: radii.sm,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
     elevation: 2, 
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
@@ -95,32 +102,32 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: 80,
     height: 80,
-    borderRadius: 8,
-    backgroundColor: '#d3d3d3',
+    borderRadius: radii.sm,
+    backgroundColor: colors.placeholder,
   },
   textContainer: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: spacing.md,
     justifyContent: 'center',
   },
   title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
-    color: '#333',
+    fontSize: fontSizes.lg,
+    fontWeight: fontWeights.bold,
+    marginBottom: spacing.xs,
+    color: colors.textSecondary,
   },
   description: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
+    fontSize: fontSizes.md,
+    color: colors.textMuted,
+    marginBottom: spacing.sm,
   },
   difficulty: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#000000',
+    fontSize: fontSizes.xs,
+    fontWeight: fontWeights.semibold,
+    color: colors.textPrimary,
   },
   deleteButton: {
-    padding: 8,
+    padding: spacing.sm,
   },
   emptyContainer: {
     flex: 1,
@@ -128,7 +135,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 18,
-    color: '#999',
+    fontSize: fontSizes.lg,
+    color: colors.textDisabled,
   }
 });
