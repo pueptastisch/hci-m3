@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StatusBar,ScrollView, StyleSheet,TouchableOpacity } from 'react-native';
 
-import AppLayout from './components/AppLayout';
+import AppLayout from '../components/AppLayout';
 
 
 export default function Settings({navigation}) {
@@ -28,6 +28,12 @@ export default function Settings({navigation}) {
         <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('CookingEquipment')}>
           <Text style={styles.itemText}>
             Cooking Equipment
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('GroupManagement')}>
+          <Text style={styles.itemText}>
+            Group Management
           </Text>
         </TouchableOpacity>
 
