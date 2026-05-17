@@ -6,6 +6,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import AppLayout from '../components/AppLayout';
 import { getGroups } from '../data/groupsStore';
+import { getDietaryPreferencesForUsernames } from '../data/users';
 
 // Mock data to get you started
 const dummyRecipes = [
@@ -65,19 +66,48 @@ export default function Explore({ navigation }) {
 
   const handleGenerate = () => {
     const selectedGroup = groups.find((group) => group.id === selectedGroupId) || null;
+    const groupDietaryPreferences = selectedGroup
+      ? getDietaryPreferencesForUsernames(selectedGroup.members)
+      : [];
+
+    const manualPreferences = preferences
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    const mergedPreferences = [...manualPreferences];
+    groupDietaryPreferences.forEach((groupPreference) => {
+      const alreadyIncluded = mergedPreferences.some(
+        (item) => item.toLowerCase() === groupPreference.toLowerCase()
+      );
+      if (!alreadyIncluded) {
+        mergedPreferences.push(groupPreference);
+      }
+    });
+
+    const finalPreferences = mergedPreferences.join(', ');
+    if (finalPreferences !== preferences) {
+      setPreferences(finalPreferences);
+    }
 
     // Generate logic here
     console.log('Generating with:', {
       ingredients,
       includeMyIngredients,
       mealType,
-      preferences,
+      preferences: finalPreferences,
       includeMyPreferences,
       groupId: selectedGroup ? selectedGroup.id : null,
       groupName: selectedGroup ? selectedGroup.name : null,
       groupMembers: selectedGroup ? selectedGroup.members : [],
+      groupDietaryPreferences,
     });
   };
+
+  const selectedGroup = groups.find((group) => group.id === selectedGroupId) || null;
+  const selectedGroupDietaryPreferences = selectedGroup
+    ? getDietaryPreferencesForUsernames(selectedGroup.members)
+    : [];
 
   const renderRecipeItem = ({ item }) => (
     <TouchableOpacity 
@@ -196,6 +226,11 @@ export default function Explore({ navigation }) {
             {groups.length === 0 ? (
               <Text style={styles.helperText}>
                 No groups yet. Create one in Settings {'>'} Group Management.
+              </Text>
+            ) : null}
+            {selectedGroup && selectedGroupDietaryPreferences.length > 0 ? (
+              <Text style={styles.helperText}>
+                Group dietary preferences that will be added: {selectedGroupDietaryPreferences.join(', ')}
               </Text>
             ) : null}
 
