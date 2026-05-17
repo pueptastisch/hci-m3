@@ -106,7 +106,7 @@ export default function RecipeDetails() {
                     <Checkbox
                       value={checkedIngredients[index]}
                       onValueChange={() => toggleIngredient(index)}
-                      color={checkedIngredients[index] ? '#4630EB' : undefined}
+                      color={checkedIngredients[index] ? '#34C759' : undefined}
                     />
                     <Text style={styles.ingredientText}>{ingredient}</Text>
                   </View>
