@@ -8,16 +8,16 @@
 
 Framework:	React Native, Expo
 
-API-Version:	
+API-Version:	36
 
 Geräte, auf dem(denen) getestet wurde:
-Pixel 7, Chrome Web browser mit pixel 7 view
+Pixel 6 in android studio, Chrome Web browser mit pixel 7 view
 
 Externe Libraries und Frameworks:
 expo, react native
 
 Dauer der Entwicklung:
-35h
+20h
 
 Weitere Anmerkungen:
 
