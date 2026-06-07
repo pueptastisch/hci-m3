@@ -9,6 +9,7 @@ import {
   StatusBar
 } from 'react-native';
 import Checkbox from 'expo-checkbox';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   colors,
@@ -16,37 +17,36 @@ import {
   radii,
   fontSizes,
   fontWeights,
+  shadows,
 } from '../design/tokens';
 import { AppContext } from '../context/AppContext';
-
-const { height } = Dimensions.get('window');
-
-
-// simple page with checkboxes for the user to select their allergies
 
 export default function Allergies({ navigation, route }) {
 
   const { allergies: selected, setAllergies: setSelected } = useContext(AppContext);
+  const insets = useSafeAreaInsets();
 
   const options = [
-    'Peanuts',
-    'Tree Nuts',
     'Dairy',
     'Eggs',
     'Fish',
-    'Shellfish',
     'Gluten',
-    'Soy',
+    'Peanuts',
     'Sesame',
+    'Shellfish',
+    'Soy',
+    'Tree Nuts',
   ];
 
   return (
     <View style={styles.screen}>
 
-      <View style={styles.container}>
-        <Text style={styles.logo}>
-          Allergies
-        </Text>
+      <View style={[styles.container, { paddingTop: insets.top || spacing.lg }]}>
+        <View style={styles.innerContainer}>
+          <Text style={styles.logo}>
+            Allergies
+          </Text>
+        </View>
       </View>
 
       <View style={styles.content}>
@@ -58,7 +58,18 @@ export default function Allergies({ navigation, route }) {
       <ScrollView style={{ flex: 1 }}>
 
         {options.map(item => (
-          <View key={item} style={styles.options}>
+          <TouchableOpacity 
+            key={item} 
+            style={styles.options}
+            activeOpacity={0.7}
+            onPress={() => {
+              if (selected.includes(item)) {
+                setSelected(selected.filter(i => i !== item));
+              } else {
+                setSelected([...selected, item]);
+              }
+            }}
+          >
 
             <Checkbox
               value={selected.includes(item)}
@@ -75,7 +86,7 @@ export default function Allergies({ navigation, route }) {
               {item}
             </Text>
 
-          </View>
+          </TouchableOpacity>
         ))}
 
       </ScrollView>
@@ -116,12 +127,18 @@ const styles = StyleSheet.create({
   },
 
   container: {
-    height: height * (2 / 12),
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.borderMuted,
+    ...shadows.sm,
+    zIndex: 10,
+  },
+
+  innerContainer: {
+    height: 60,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: spacing.lg,
   },
 
   logo: {
@@ -142,67 +159,63 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     marginTop: spacing.xl,
     marginBottom: spacing.xxxl + 10,
-    fontSize: fontSizes.xxxl,
+    fontSize: fontSizes.xl,
     textAlign: 'center',
+    fontWeight: fontWeights.semibold,
   },
 
   options: {
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: spacing.lg - 1,
-    marginBottom: spacing.xl,
-    },
+    marginBottom: spacing.lg,
+  },
   optionstext: {
     color: colors.textPrimary,
-    fontSize: fontSizes.xxxl,
+    fontSize: fontSizes.lg,
     marginLeft: spacing.sm + 2,
   },
 
   bottomSection: {
-    height: height * (2 / 12),
-
+    paddingVertical: spacing.xl,
+    paddingBottom: spacing.xxxl,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderMuted,
   },
 
   leftButton: {
-    width: 190,
-    height: 70,
-
+    width: 140,
+    height: 50,
     borderWidth: 1,
-
     backgroundColor: '#CFF7D3',
-
     borderColor: colors.brand,
-    
     borderRadius: radii.md,
-    marginBottom: spacing.xxxl + 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   rightButton: {
-    width: 190,
-    height: 70,
-
+    width: 170,
+    height: 50,
     backgroundColor: colors.brand,
-
     borderRadius: radii.md,
-    marginBottom: spacing.xxxl + 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   leftButtonText: {
     color: colors.textPrimary,
-    fontSize: fontSizes.xl,
+    fontSize: fontSizes.lg,
     fontWeight: fontWeights.bold,
   },
 
   rightButtonText: {
     color: colors.textPrimary,
-    fontSize: fontSizes.xl,
+    fontSize: fontSizes.lg,
     fontWeight: fontWeights.bold,
   },
 });

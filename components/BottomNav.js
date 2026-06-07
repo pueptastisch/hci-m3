@@ -4,30 +4,26 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
-  Dimensions,
 } from 'react-native';
-import { useNavigation , useNavigationState  } from '@react-navigation/native';
-import { colors } from '../design/tokens';
-
-
-
-
-const { height } = Dimensions.get('window');
+import { useNavigation, useNavigationState } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, spacing, shadows } from '../design/tokens';
 
 export default function BottomNav() {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
   const activeRoute = useNavigationState(
     state => state.routes[state.index].name
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: insets.bottom || spacing.sm }]}>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Explore')}>
+      <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('Explore')}>
         <Image
           source={
-            activeRoute  === 'Explore'
+            activeRoute === 'Explore'
               ? require('../assets/HomeActive.png')
               : require('../assets/Home.png')
           }
@@ -35,10 +31,10 @@ export default function BottomNav() {
         />
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('MyIngredients')}>
+      <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('MyIngredients')}>
         <Image
           source={
-            activeRoute  === 'MyIngredients'
+            activeRoute === 'MyIngredients'
               ? require('../assets/IngredientsActive.png')
               : require('../assets/Ingredients.png')
           }
@@ -46,10 +42,10 @@ export default function BottomNav() {
         />
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('SavedRecipes')}>
+      <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('SavedRecipes')}>
         <Image
           source={
-            activeRoute  === 'SavedRecipes'
+            activeRoute === 'SavedRecipes'
               ? require('../assets/SavedActive.png')
               : require('../assets/Saved.png')
           }
@@ -57,10 +53,10 @@ export default function BottomNav() {
         />
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+      <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('Settings')}>
         <Image
           source={
-            activeRoute  === 'Settings'
+            activeRoute === 'Settings'
               ? require('../assets/SettingsActive.png')
               : require('../assets/Settings.png')
           }
@@ -74,20 +70,27 @@ export default function BottomNav() {
 
 const styles = StyleSheet.create({
   container: {
-    height: height * (1.5 / 12),
-    backgroundColor: colors.background,
-
+    backgroundColor: colors.surface,
     borderTopWidth: 1,
     borderTopColor: colors.borderMuted,
-
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
+    paddingTop: spacing.sm,
+    ...shadows.md,
+    elevation: 10,
+  },
+
+  tab: {
+    padding: spacing.sm,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   icon: {
-    width: 48,
-    height: 48,
+    width: 28,
+    height: 28,
     resizeMode: 'contain',
   },
 });

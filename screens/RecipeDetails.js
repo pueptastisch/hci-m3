@@ -122,14 +122,19 @@ export default function RecipeDetails() {
             <View style={styles.ingredientsContainer}>
               <ScrollView>
                 {DUMMY_RECIPE.ingredients.map((ingredient, index) => (
-                  <View key={index} style={styles.ingredientRow}>
+                  <TouchableOpacity 
+                    key={index} 
+                    style={styles.ingredientRow}
+                    activeOpacity={0.7}
+                    onPress={() => toggleIngredient(index)}
+                  >
                     <Checkbox
                       value={checkedIngredients[index]}
                       onValueChange={() => toggleIngredient(index)}
                       color={checkedIngredients[index] ? colors.brand : undefined}
                     />
                     <Text style={styles.ingredientText}>{ingredient}</Text>
-                  </View>
+                  </TouchableOpacity>
                 ))}
               </ScrollView>
               <View style={styles.exportButtonContainer}>
@@ -184,17 +189,18 @@ const styles = StyleSheet.create({
     width: '100%',
     position: 'relative',
     marginBottom: spacing.md,
+    alignItems: 'center',
   },
   image: {
-    width: '100%',
-    height: 180,
-    borderRadius: radii.sm,
+    width: '85%',
+    height: 140,
+    borderRadius: radii.md,
     backgroundColor: colors.placeholder,
   },
   saveIcon: {
     position: 'absolute',
     bottom: spacing.sm,
-    right: spacing.sm,
+    right: '7.5%',
     backgroundColor: 'rgba(255,255,255,0.8)',
     borderRadius: 20,
     padding: spacing.xs + 2,

@@ -1,6 +1,7 @@
 import React from 'react'
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import DietaryPreferences from './screens/DietaryPreferences';
 import Allergies from './screens/Allergies';
 import Explore from './screens/Explore';
@@ -14,8 +15,9 @@ import { AppProvider } from './context/AppContext';
 const Stack = createNativeStackNavigator();
 export default function App() {
   return (
-    <AppProvider>
-      <NavigationContainer>
+    <SafeAreaProvider>
+      <AppProvider>
+        <NavigationContainer>
         <Stack.Navigator
           initialRouteName="DietaryPreferences"
           screenOptions={{
@@ -62,5 +64,6 @@ export default function App() {
       </Stack.Navigator>
     </NavigationContainer>
     </AppProvider>
+    </SafeAreaProvider>
   );
 }

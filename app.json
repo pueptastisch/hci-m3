@@ -12,6 +12,12 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
+      },
+      "package": "recipy.test"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "98d93a4a-dbe1-4136-b144-0ac58e8d2e4d"
       }
     }
   }

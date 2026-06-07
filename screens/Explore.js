@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, TextInput, Button, ScrollView } from 'react-native';
+import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import Checkbox from 'expo-checkbox';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -12,6 +12,7 @@ import {
   radii,
   fontSizes,
   fontWeights,
+  shadows,
 } from '../design/tokens';
 
 // Mock data to get you started
@@ -186,14 +187,18 @@ export default function Explore({ navigation }) {
               onChangeText={setIngredients}
             />
 
-            <View style={styles.checkboxRow}>
+            <TouchableOpacity 
+              style={styles.checkboxRow}
+              activeOpacity={0.7}
+              onPress={() => setIncludeMyIngredients(!includeMyIngredients)}
+            >
               <Checkbox
                 value={includeMyIngredients}
                 onValueChange={setIncludeMyIngredients}
                 color={includeMyIngredients ? colors.brand : undefined}
               />
               <Text style={styles.checkboxLabel}>Include My Ingredients</Text>
-            </View>
+            </TouchableOpacity>
 
             <Text style={styles.label}>Meal Type</Text>
             <TextInput 
@@ -213,14 +218,18 @@ export default function Explore({ navigation }) {
               numberOfLines={3}
             />
 
-            <View style={styles.checkboxRow}>
+            <TouchableOpacity 
+              style={styles.checkboxRow}
+              activeOpacity={0.7}
+              onPress={() => setIncludeMyPreferences(!includeMyPreferences)}
+            >
               <Checkbox
                 value={includeMyPreferences}
                 onValueChange={setIncludeMyPreferences}
                 color={includeMyPreferences ? colors.brand : undefined}
               />
               <Text style={styles.checkboxLabel}>Include My Preferences</Text>
-            </View>
+            </TouchableOpacity>
 
             <Text style={styles.label}>Group For Recipe Generation</Text>
             <View style={styles.dropdownContainer}>
@@ -275,12 +284,12 @@ export default function Explore({ navigation }) {
             ) : null}
 
             <View style={styles.formActions}>
-              <View style={styles.buttonWrapper}>
-                <Button title="Clear" onPress={handleClear} color={colors.textDisabled} />
-              </View>
-              <View style={styles.buttonWrapper}>
-                <Button title="Generate Recipe" onPress={handleGenerate} color={colors.brand} />
-              </View>
+              <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={handleClear}>
+                <Text style={styles.buttonSecondaryText}>Clear</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.button, styles.buttonPrimary]} onPress={handleGenerate}>
+                <Text style={styles.buttonPrimaryText}>Generate Recipe</Text>
+              </TouchableOpacity>
             </View>
           </ScrollView>
         )}
@@ -292,151 +301,181 @@ export default function Explore({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundWarm,
+    backgroundColor: colors.background,
   },
   tabContainer: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderColor: colors.borderLight,
     backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   tabButton: {
     flex: 1,
-    paddingVertical: 14,
+    paddingVertical: spacing.lg,
     alignItems: 'center',
+    borderBottomWidth: 3,
+    borderBottomColor: 'transparent',
   },
   activeTab: {
-    borderBottomWidth: 3,
     borderBottomColor: colors.brand,
   },
   tabText: {
-    fontSize: fontSizes.lg,
-    fontWeight: fontWeights.semibold,
-    color: colors.textDisabled,
+    fontSize: fontSizes.md,
+    fontWeight: fontWeights.medium,
+    color: colors.textMuted,
   },
   activeTabText: {
     color: colors.brand,
+    fontWeight: fontWeights.semibold,
   },
   contentContainer: {
     flex: 1,
   },
   header: {
-    fontSize: fontSizes.xxxl,
-    fontWeight: 'bold',
-    margin: spacing.lg,
-    color: colors.textSecondary,
+    fontSize: fontSizes.display,
+    fontWeight: fontWeights.bold,
+    marginVertical: spacing.lg,
+    marginHorizontal: spacing.lg,
+    color: colors.textPrimary,
+    fontFamily: 'Jaini-Regular',
   },
   listContainer: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
+    paddingBottom: spacing.xxxl,
   },
   formContainer: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxxl,
   },
   label: {
-    fontSize: fontSizes.lg,
+    fontSize: fontSizes.sm,
     fontWeight: fontWeights.semibold,
     color: colors.textSecondary,
-    marginBottom: 6,
-    marginTop: spacing.md,
+    marginBottom: spacing.xs,
+    marginTop: spacing.xl,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   input: {
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.borderLight,
-    borderRadius: radii.sm,
+    borderRadius: radii.md,
     padding: spacing.md,
-    fontSize: fontSizes.lg,
-    color: colors.textSecondary,
+    fontSize: fontSizes.md,
+    color: colors.textPrimary,
+    ...shadows.sm,
   },
   dropdownContainer: {
-    marginTop: 4,
+    marginTop: spacing.xs,
   },
   dropdownTrigger: {
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.borderLight,
-    borderRadius: radii.sm,
+    borderRadius: radii.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    ...shadows.sm,
   },
   dropdownTriggerText: {
     flex: 1,
-    fontSize: fontSizes.lg,
-    color: colors.textSecondary,
+    fontSize: fontSizes.md,
+    color: colors.textPrimary,
   },
   dropdownChevron: {
     marginLeft: spacing.sm,
-    fontSize: fontSizes.sm,
+    fontSize: fontSizes.xs,
     color: colors.textMuted,
   },
   dropdownMenu: {
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
     borderWidth: 1,
     borderColor: colors.borderLight,
-    borderRadius: radii.sm,
+    borderRadius: radii.md,
     backgroundColor: colors.surface,
     overflow: 'hidden',
+    ...shadows.md,
   },
   dropdownItem: {
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
+    borderBottomColor: colors.border,
   },
   dropdownItemText: {
-    fontSize: fontSizes.lg,
-    color: colors.textSecondary,
+    fontSize: fontSizes.md,
+    color: colors.textPrimary,
   },
   helperText: {
-    marginTop: 6,
-    fontSize: fontSizes.sm,
+    marginTop: spacing.xs,
+    fontSize: fontSizes.xs,
     color: colors.textMuted,
+    fontStyle: 'italic',
   },
   checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: spacing.md,
-    marginBottom: 6,
+    marginTop: spacing.lg,
   },
   checkboxLabel: {
-    marginLeft: spacing.sm + 2,
-    fontSize: fontSizes.lg,
+    marginLeft: spacing.sm,
+    fontSize: fontSizes.md,
     color: colors.textSecondary,
   },
   textArea: {
-    height: 80,
+    height: 100,
     textAlignVertical: 'top',
   },
   formActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: spacing.xxl,
+    marginTop: spacing.xxxl,
   },
-  buttonWrapper: {
+  button: {
     flex: 0.48,
+    borderRadius: radii.lg,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.sm,
+  },
+  buttonPrimary: {
+    backgroundColor: colors.brand,
+  },
+  buttonPrimaryText: {
+    color: colors.surface,
+    fontSize: fontSizes.md,
+    fontWeight: fontWeights.bold,
+  },
+  buttonSecondary: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  buttonSecondaryText: {
+    color: colors.textSecondary,
+    fontSize: fontSizes.md,
+    fontWeight: fontWeights.semibold,
   },
   card: {
     flexDirection: 'row',
     backgroundColor: colors.surface,
-    borderRadius: radii.sm,
+    borderRadius: radii.lg,
     padding: spacing.md,
     marginBottom: spacing.lg,
-    elevation: 2, 
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
+    ...shadows.md,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   thumbnail: {
-    width: 80,
-    height: 80,
-    borderRadius: radii.sm,
-    backgroundColor: colors.placeholder,
+    width: 88,
+    height: 88,
+    borderRadius: radii.md,
+    backgroundColor: colors.borderMuted,
   },
   textContainer: {
     flex: 1,
@@ -445,18 +484,25 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: fontSizes.lg,
-    fontWeight: 'bold',
-    marginBottom: 4,
-    color: colors.textSecondary,
+    fontWeight: fontWeights.bold,
+    marginBottom: spacing.xs,
+    color: colors.textPrimary,
   },
   description: {
-    fontSize: fontSizes.md,
+    fontSize: fontSizes.sm,
     color: colors.textMuted,
-    marginBottom: 8,
+    marginBottom: spacing.sm,
+    lineHeight: 20,
   },
   difficulty: {
     fontSize: fontSizes.xs,
-    fontWeight: fontWeights.semibold,
-    color: colors.textPrimary,
+    fontWeight: fontWeights.medium,
+    color: colors.brand,
+    backgroundColor: colors.brandLight,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.sm,
+    alignSelf: 'flex-start',
+    overflow: 'hidden',
   },
 });
