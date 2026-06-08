@@ -44,9 +44,8 @@ export default function SavedRecipes({ navigation }) {
   );
 
   return (
-    <AppLayout>
+    <AppLayout title="Saved Recipes">
       <View style={styles.container}>
-        <Text style={styles.header}>Saved Recipes</Text>
         {savedRecipes.length > 0 ? (
           <FlatList
             data={savedRecipes}

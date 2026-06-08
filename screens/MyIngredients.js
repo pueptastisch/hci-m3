@@ -17,6 +17,7 @@ import {
   radii,
   fontSizes,
   fontWeights,
+  shadows,
 } from '../design/tokens';
 import { AppContext } from '../context/AppContext';
 
@@ -25,31 +26,44 @@ import { AppContext } from '../context/AppContext';
 
 export default function MyIngredients() {
 
-  const [popupVisible, setPopupVisible] = useState(false);
-
   const [ingredient, setIngredient] = useState('');
 
   const { myIngredients: ingredients, setMyIngredients: setIngredients } = useContext(AppContext);
 
+  const handleAdd = () => {
+    if (ingredient.trim() !== '') {
+      setIngredients([
+        ...ingredients,
+        ingredient.trim()
+      ]);
+      setIngredient('');
+    }
+  };
+
   return (
-    <AppLayout>
+    <AppLayout title="My Ingredients">
 
       <StatusBar
         barStyle="dark-content"
         backgroundColor={colors.background}
       />
 
-      <View style={styles.topRow}>
-        <Text style={styles.headerTitle}>My Ingredients</Text>
-        <TouchableOpacity
-          onPress={() => setPopupVisible(true)}
-        >
-          <Image
-            source={require('../assets/Add.png')}
-            style={styles.addIcon}
+      <View style={styles.headerSection}>
+        <View style={styles.addForm}>
+          <TextInput
+            placeholder="Add new ingredient"
+            value={ingredient}
+            onChangeText={setIngredient}
+            style={styles.input}
+            placeholderTextColor={colors.placeholder}
           />
-        </TouchableOpacity>
-
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={handleAdd}
+          >
+            <Text style={styles.addButtonText}>Add</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView style={styles.ingredientsContainer}>
@@ -83,81 +97,60 @@ export default function MyIngredients() {
 
       </ScrollView>
 
-      {popupVisible && (
-
-        <View style={styles.popup}>
-
-          <TextInput
-            placeholder="Enter ingredient"
-            value={ingredient}
-            onChangeText={setIngredient}
-            style={styles.input}
-          />
-
-          <View style={styles.popupButtons}>
-
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => setPopupVisible(false)}
-            >
-              <Text style={styles.buttonText}>
-                Back
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => {
-
-                if (ingredient.trim() !== '') {
-
-                  setIngredients([
-                    ...ingredients,
-                    ingredient
-                  ]);
-
-                  setIngredient('');
-                  setPopupVisible(false);
-                }
-
-              }}
-            >
-              <Text style={styles.buttonText}>
-                Add
-              </Text>
-            </TouchableOpacity>
-
-          </View>
-
-        </View>
-
-      )}
-
     </AppLayout>
   );
 }
 
 const styles = StyleSheet.create({
 
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  headerSection: {
     paddingHorizontal: spacing.xl,
     paddingTop: spacing.xl,
-    paddingBottom: spacing.sm + 2,
+    paddingBottom: spacing.lg,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderMuted,
+    ...shadows.sm,
   },
 
   headerTitle: {
     fontSize: fontSizes.xxxl,
     fontWeight: fontWeights.bold,
     color: colors.textSecondary,
+    marginBottom: spacing.md,
   },
 
-  addIcon: {
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
+  addForm: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    fontSize: fontSizes.lg,
+    backgroundColor: colors.background,
+    color: colors.textPrimary,
+  },
+
+  addButton: {
+    backgroundColor: colors.brand,
+    marginLeft: spacing.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    borderRadius: radii.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...shadows.sm,
+  },
+
+  addButtonText: {
+    fontSize: fontSizes.lg,
+    fontWeight: fontWeights.bold,
+    color: colors.surface,
   },
 
   ingredientsContainer: {
@@ -166,83 +159,23 @@ const styles = StyleSheet.create({
   },
 
   ingredientText: {
-    fontSize: fontSizes.xxxl,
-    marginBottom: spacing.lg - 1,
+    fontSize: fontSizes.xl,
     color: colors.textPrimary,
   },
 
-  popup: {
-    position: 'absolute',
-
-    top: '35%',
-    left: 20,
-    right: 20,
-
-    backgroundColor: colors.surface,
-
-    padding: spacing.xl,
-
-    borderRadius: 20,
-
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  input: {
-    borderWidth: 1,
-    borderColor: colors.borderMuted,
-
-    borderRadius: radii.sm + 2,
-
-    padding: spacing.md + 3,
-
-    fontSize: fontSizes.xl + 2,
-
-    marginBottom: spacing.xl,
-  },
-
-  popupButtons: {
+  ingredientRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+    paddingVertical: spacing.xs,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderMuted,
   },
-
-  backButton: {
-    backgroundColor: '#CFF7D3',
-
-    paddingVertical: spacing.sm + 4,
-    paddingHorizontal: spacing.xl + 30,
-
-    borderRadius: radii.md,
-
-    borderWidth: 1,
-    borderColor: colors.brand,
-  },
-
-  addButton: {
-    backgroundColor: colors.brand,
-
-    paddingVertical: spacing.sm + 4,
-    paddingHorizontal: spacing.xl + 30,
-
-    borderRadius: radii.md,
-  },
-
-  buttonText: {
-    fontSize: fontSizes.xl,
-    fontWeight: fontWeights.bold,
-    color: colors.textPrimary,
-  },
-  ingredientRow: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-
-  marginBottom: spacing.lg - 1,
-},
 
   deleteIcon: {
-    width: 28,
-    height: 28,
+    width: 24,
+    height: 24,
     resizeMode: 'contain',
   },
 });

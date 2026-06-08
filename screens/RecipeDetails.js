@@ -12,48 +12,39 @@ import {
   fontWeights,
 } from '../design/tokens';
 import { AppContext } from '../context/AppContext';
+import { getRecipeById } from '../data/recipesStore';
 
-const DUMMY_RECIPE = {
-  id: '1',
-  title: 'Spaghetti Carbonara',
-  description: 'A classic Italian pasta dish made with egg, hard cheese, cured pork, and black pepper.',
-  difficulty: '2/5',
-  image: 'https://img.chefkoch-cdn.de/rezepte/1298241234947062/bilder/1616493/crop-640x427/carbonara-wie-bei-der-mamma-in-rom.jpg',
-  ingredients: [
-    '200g Spaghetti',
-    '100g Pancetta',
-    '2 large eggs',
-    '50g Pecorino cheese',
-    'Black pepper'
-  ],
-  steps: [
-    'Boil the pasta in salted water.',
-    'Fry the pancetta until crisp.',
-    'Beat the eggs and mix with grated cheese.',
-    'Combine hot pasta with pancetta, then remove from heat.',
-    'Quickly stir in the egg and cheese mixture until creamy.',
-    'Serve immediately with extra black pepper.'
-  ]
-};
+export default function RecipeDetails({ route }) {
+  const { recipeId } = route.params;
+  const recipe = getRecipeById(recipeId);
 
-export default function RecipeDetails() {
   const [activeTab, setActiveTab] = useState('Ingredients');
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const { savedRecipes, setSavedRecipes } = useContext(AppContext);
   
-  const isSaved = savedRecipes.some(recipe => recipe.id === DUMMY_RECIPE.id);
+  if (!recipe) {
+    return (
+      <AppLayout>
+        <View style={styles.container}>
+          <Text style={styles.title}>Recipe not found</Text>
+        </View>
+      </AppLayout>
+    );
+  }
+
+  const isSaved = savedRecipes.some(r => r.id === recipe.id);
 
   const toggleSave = () => {
     if (isSaved) {
-      setSavedRecipes(savedRecipes.filter(r => r.id !== DUMMY_RECIPE.id));
+      setSavedRecipes(savedRecipes.filter(r => r.id !== recipe.id));
     } else {
-      setSavedRecipes([...savedRecipes, DUMMY_RECIPE]);
+      setSavedRecipes([...savedRecipes, recipe]);
     }
   };
   
   // Keep track of which ingredients are checked
   const [checkedIngredients, setCheckedIngredients] = useState(
-    new Array(DUMMY_RECIPE.ingredients.length).fill(false)
+    new Array(recipe.ingredients.length).fill(false)
   );
 
   const toggleIngredient = (index) => {
@@ -63,7 +54,7 @@ export default function RecipeDetails() {
   };
 
   const handleNextStep = () => {
-    if (currentStepIndex < DUMMY_RECIPE.steps.length - 1) {
+    if (currentStepIndex < recipe.steps.length - 1) {
       setCurrentStepIndex(currentStepIndex + 1);
     }
   };
@@ -74,13 +65,22 @@ export default function RecipeDetails() {
     }
   };
 
+  const [showCopiedMessage, setShowCopiedMessage] = useState(false);
+
+  const handleExport = () => {
+    // In a real app, we would actually copy to clipboard here
+    setShowCopiedMessage(true);
+    setTimeout(() => setShowCopiedMessage(false), 2000);
+    console.log('Export hit');
+  };
+
   return (
     <AppLayout>
       <View style={styles.container}>
         {/* Top Half: Image & Description */}
         <View style={styles.topSection}>
           <View style={styles.imageContainer}>
-            <Image source={{ uri: DUMMY_RECIPE.image }} style={styles.image} />
+            <Image source={{ uri: recipe.image }} style={styles.image} />
             <TouchableOpacity 
               style={styles.saveIcon} 
               onPress={toggleSave}
@@ -92,8 +92,8 @@ export default function RecipeDetails() {
               />
             </TouchableOpacity>
           </View>
-          <Text style={styles.title}>{DUMMY_RECIPE.title}</Text>
-          <Text style={styles.description}>{DUMMY_RECIPE.description}</Text>
+          <Text style={styles.title}>{recipe.title}</Text>
+          <Text style={styles.description}>{recipe.description}</Text>
         </View>
 
         {/* Tab Buttons */}
@@ -121,7 +121,7 @@ export default function RecipeDetails() {
           {activeTab === 'Ingredients' ? (
             <View style={styles.ingredientsContainer}>
               <ScrollView>
-                {DUMMY_RECIPE.ingredients.map((ingredient, index) => (
+                {recipe.ingredients.map((ingredient, index) => (
                   <TouchableOpacity 
                     key={index} 
                     style={styles.ingredientRow}
@@ -136,19 +136,27 @@ export default function RecipeDetails() {
                     <Text style={styles.ingredientText}>{ingredient}</Text>
                   </TouchableOpacity>
                 ))}
+                <Text style={styles.exportHint}>
+                  Mark the ingredients you don't have to export them as a shopping list.
+                </Text>
               </ScrollView>
               <View style={styles.exportButtonContainer}>
-                <Button title="Export List" onPress={() => console.log('Export hit')} color={colors.brand} />
+                {showCopiedMessage && (
+                  <View style={styles.copiedBadge}>
+                    <Text style={styles.copiedBadgeText}>Copied to clipboard!</Text>
+                  </View>
+                )}
+                <Button title="Export List" onPress={handleExport} color={colors.brand} />
               </View>
             </View>
           ) : (
             <View style={styles.stepsContainer}>
               <Text style={styles.stepIndicator}>
-                Step {currentStepIndex + 1} of {DUMMY_RECIPE.steps.length}
+                Step {currentStepIndex + 1} of {recipe.steps.length}
               </Text>
               <View style={styles.stepCard}>
                 <Text style={styles.stepText}>
-                  {DUMMY_RECIPE.steps[currentStepIndex]}
+                  {recipe.steps[currentStepIndex]}
                 </Text>
               </View>
 
@@ -162,7 +170,7 @@ export default function RecipeDetails() {
                 <Button 
                   title="Next" 
                   onPress={handleNextStep} 
-                  disabled={currentStepIndex === DUMMY_RECIPE.steps.length - 1} 
+                  disabled={currentStepIndex === recipe.steps.length - 1} 
                   color={colors.brand}
                 />
               </View>
@@ -291,5 +299,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingTop: spacing.lg,
+  },
+  exportHint: {
+    fontSize: fontSizes.sm,
+    color: colors.textMuted,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: spacing.lg,
+    paddingHorizontal: spacing.md,
+  },
+  copiedBadge: {
+    position: 'absolute',
+    top: -40,
+    alignSelf: 'center',
+    backgroundColor: colors.textPrimary,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+    borderRadius: radii.full,
+    zIndex: 100,
+  },
+  copiedBadgeText: {
+    color: colors.surface,
+    fontSize: fontSizes.xs,
+    fontWeight: fontWeights.bold,
   },
 });

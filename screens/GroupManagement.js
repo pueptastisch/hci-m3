@@ -131,9 +131,8 @@ export default function GroupManagement({ navigation }) {
   const selectedGroup = groups.find((group) => group.id === selectedGroupId) || null;
 
   return (
-    <AppLayout>
+    <AppLayout title="Group Management">
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <Text style={styles.header}>Group Management</Text>
 
         <Text style={styles.sectionTitle}>Create Group</Text>
         <TextInput

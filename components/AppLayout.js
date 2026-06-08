@@ -8,10 +8,10 @@ import TopBar from './TopBar';
 import BottomNav from './BottomNav';
 import { colors } from '../design/tokens';
 
-export default function AppLayout({ children }) {
+export default function AppLayout({ children, title }) {
   return (
     <View style={styles.container}>
-      <TopBar />
+      <TopBar title={title} />
       <View style={styles.content}>
         {children}
       </View>

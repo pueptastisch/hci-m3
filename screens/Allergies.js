@@ -21,6 +21,8 @@ import {
 } from '../design/tokens';
 import { AppContext } from '../context/AppContext';
 
+import TopBar from '../components/TopBar';
+
 export default function Allergies({ navigation, route }) {
 
   const { allergies: selected, setAllergies: setSelected } = useContext(AppContext);
@@ -31,23 +33,44 @@ export default function Allergies({ navigation, route }) {
     'Eggs',
     'Fish',
     'Gluten',
+    'None',
     'Peanuts',
     'Sesame',
     'Shellfish',
     'Soy',
     'Tree Nuts',
-  ];
+  ].sort((a, b) => {
+    if (a === 'None') return -1;
+    if (b === 'None') return 1;
+    return a.localeCompare(b);
+  });
+
+  const handleToggle = (item) => {
+    if (item === 'None') {
+      setSelected(['None']);
+    } else {
+      let next = selected.filter(i => i !== 'None');
+      if (next.includes(item)) {
+        next = next.filter(i => i !== item);
+      } else {
+        next = [...next, item];
+      }
+      if (next.length === 0) next = ['None'];
+      setSelected(next);
+    }
+  };
+
+  const handleNext = () => {
+    if (route.params?.fromSettings) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('CookingEquipment');
+    }
+  };
 
   return (
     <View style={styles.screen}>
-
-      <View style={[styles.container, { paddingTop: insets.top || spacing.lg }]}>
-        <View style={styles.innerContainer}>
-          <Text style={styles.logo}>
-            Allergies
-          </Text>
-        </View>
-      </View>
+      <TopBar title="Allergies" />
 
       <View style={styles.content}>
         <Text style={styles.descriptionText}>
@@ -62,24 +85,12 @@ export default function Allergies({ navigation, route }) {
             key={item} 
             style={styles.options}
             activeOpacity={0.7}
-            onPress={() => {
-              if (selected.includes(item)) {
-                setSelected(selected.filter(i => i !== item));
-              } else {
-                setSelected([...selected, item]);
-              }
-            }}
+            onPress={() => handleToggle(item)}
           >
 
             <Checkbox
               value={selected.includes(item)}
-              onValueChange={() => {
-                if (selected.includes(item)) {
-                  setSelected(selected.filter(i => i !== item));
-                } else {
-                  setSelected([...selected, item]);
-                }
-              }}
+              onValueChange={() => handleToggle(item)}
             />
 
             <Text style={styles.optionstext}>
@@ -93,25 +104,15 @@ export default function Allergies({ navigation, route }) {
 
       <View style={styles.bottomSection}>
 
-        <TouchableOpacity style={styles.leftButton} onPress={() => {
-                                                              if (route.params?.fromSettings) {
-                                                                  navigation.goBack();
-                                                              } else {
-                                                                navigation.navigate('Explore');
-                                                              }}}>
+        <TouchableOpacity style={styles.leftButton} onPress={handleNext}>
           <Text style={styles.leftButtonText}>
             setup later
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.rightButton} onPress={() => {
-                                                              if (route.params?.fromSettings) {
-                                                                  navigation.goBack();
-                                                              } else {
-                                                                navigation.navigate('Explore');
-                                                              }}}>
+        <TouchableOpacity style={styles.rightButton} onPress={handleNext}>
           <Text style={styles.rightButtonText}>
-            choose selected
+            continue
           </Text>
         </TouchableOpacity>
 

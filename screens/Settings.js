@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 
 import AppLayout from '../components/AppLayout';
 import {
@@ -7,72 +7,92 @@ import {
   spacing,
   radii,
   fontSizes,
+  fontWeights,
+  shadows,
 } from '../design/tokens';
+import { AppContext } from '../context/AppContext';
 
+export default function Settings({ navigation }) {
+  const { resetApp } = useContext(AppContext);
 
-//settings page to navigate to the different subpages (dietary preferences, allergies, cooking equipment, 
-// group management, payment info, subscription, log out)
+  const handleLogout = () => {
+    Alert.alert(
+      "Log Out",
+      "Are you sure you want to log out? This will erase all your preferences and ingredients.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { 
+          text: "Log Out", 
+          style: "destructive",
+          onPress: () => {
+            resetApp();
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Welcome' }],
+            });
+          }
+        }
+      ]
+    );
+  };
 
-export default function Settings({navigation}) {
   return (
-    <AppLayout>
+    <AppLayout title="Settings">
       <ScrollView style={styles.container}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Preferences</Text>
 
-        <Text style={styles.sectionTitle}>
-          Preferences
-        </Text>
+          <TouchableOpacity 
+            style={styles.item} 
+            onPress={() => navigation.navigate('DietaryPreferences', { fromSettings: true })}
+          >
+            <Text style={styles.itemText}>Dietary Preferences</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('DietaryPreferences' , { fromSettings: true })}>
-          <Text style={styles.itemText}>
-            Dietary Preferences
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.item} 
+            onPress={() => navigation.navigate('Allergies', { fromSettings: true })}
+          >
+            <Text style={styles.itemText}>Allergies</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Allergies', { fromSettings: true })}>
-          <Text style={styles.itemText}>
-            Allergies
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.item} 
+            onPress={() => navigation.navigate('CookingEquipment', { fromSettings: true })}
+          >
+            <Text style={styles.itemText}>Cooking Equipment</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('CookingEquipment')}>
-          <Text style={styles.itemText}>
-            Cooking Equipment
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.item} 
+            onPress={() => navigation.navigate('GroupManagement')}
+          >
+            <Text style={styles.itemText}>Group Management</Text>
+          </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('GroupManagement')}>
-          <Text style={styles.itemText}>
-            Group Management
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Account</Text>
 
+          <TouchableOpacity 
+            style={styles.item} 
+            onPress={() => navigation.navigate('Subscription')}
+          >
+            <Text style={styles.itemText}>Subscription</Text>
+          </TouchableOpacity>
 
+          <TouchableOpacity 
+            style={styles.item} 
+            onPress={() => navigation.navigate('PaymentInfo')}
+          >
+            <Text style={styles.itemText}>Payment Info</Text>
+          </TouchableOpacity>
 
-        <Text style={styles.sectionTitle}>
-          Account
-        </Text>
-
-        <TouchableOpacity style={styles.item}>
-          <Text style={styles.itemText}>
-            Payment Info
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.item}>
-          <Text style={styles.itemText}>
-            Subscription
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.item}>
-          <Text style={styles.itemText}>
-            Log Out
-          </Text>
-        </TouchableOpacity>
-        
-
+          <TouchableOpacity style={styles.item} onPress={handleLogout}>
+            <Text style={[styles.itemText, { color: colors.danger }]}>Log Out</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
-      
     </AppLayout>
   );
 }
@@ -83,27 +103,29 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     padding: spacing.xl,
   },
-
-  sectionTitle: {
-    fontSize: fontSizes.display,
-    fontWeight: 'bold',
-    marginTop: spacing.xl,
-    marginBottom: spacing.lg - 1,
-    color: colors.textPrimary,
+  section: {
+    marginBottom: spacing.xxl,
   },
-
+  sectionTitle: {
+    fontSize: fontSizes.lg,
+    fontWeight: fontWeights.bold,
+    color: colors.textSecondary,
+    marginBottom: spacing.md,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
   item: {
     backgroundColor: colors.surface,
-    padding: 18,
+    padding: 14,
     borderRadius: radii.md,
-    marginBottom: spacing.lg - 1,
-
+    marginBottom: spacing.md,
     borderWidth: 1,
     borderColor: colors.border,
+    ...shadows.sm,
   },
-
   itemText: {
-    fontSize: fontSizes.xxl,
+    fontSize: fontSizes.lg,
     color: colors.textPrimary,
+    fontWeight: fontWeights.medium,
   },
 });

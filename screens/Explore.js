@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import React, { useCallback, useState, useEffect, useRef, useContext } from 'react';
+import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, TextInput, ScrollView, Animated, Easing } from 'react-native';
 import Checkbox from 'expo-checkbox';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -15,29 +15,57 @@ import {
   shadows,
 } from '../design/tokens';
 
-// Mock data to get you started
-const dummyRecipes = [
-  {
-    id: '1',
-    title: 'Spaghetti Carbonara',
-    description: 'A classic Italian pasta dish made with egg, hard cheese, cured pork, and black pepper.',
-    difficulty: '2/5',
-    image: 'https://img.chefkoch-cdn.de/rezepte/1298241234947062/bilder/1616493/crop-640x427/carbonara-wie-bei-der-mamma-in-rom.jpg',
-  }
-];
+import { AppContext } from '../context/AppContext';
+import { ALL_RECIPES } from '../data/recipesStore';
+
+const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Snack'];
+
+const GeneratingAnimation = () => {
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 1500,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, [rotateAnim]);
+
+  const spin = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  return (
+    <View style={styles.loadingContainer}>
+      <Animated.View style={[styles.spinner, { transform: [{ rotate: spin }] }]} />
+      <Text style={styles.loadingText}>Recipy is creating your perfect dish...</Text>
+    </View>
+  );
+};
 
 export default function Explore({ navigation }) {
   const [activeTab, setActiveTab] = useState('Explore Recipes');
+  const { myIngredients, dietaryPreferences, allergies, cookingEquipment } = useContext(AppContext);
   
   // Generate Form State
   const [ingredients, setIngredients] = useState('');
   const [includeMyIngredients, setIncludeMyIngredients] = useState(false);
   const [mealType, setMealType] = useState('');
+  const [isMealTypeDropdownOpen, setIsMealTypeDropdownOpen] = useState(false);
   const [preferences, setPreferences] = useState('');
   const [includeMyPreferences, setIncludeMyPreferences] = useState(false);
   const [groups, setGroups] = useState([]);
   const [selectedGroupId, setSelectedGroupId] = useState('none');
   const [isGroupDropdownOpen, setIsGroupDropdownOpen] = useState(false);
+
+  // Generation result state
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedRecipes, setGeneratedRecipes] = useState([]);
+  const [hasGenerated, setHasGenerated] = useState(false);
 
   const loadGroups = useCallback(() => {
     const nextGroups = getGroups();
@@ -52,7 +80,6 @@ export default function Explore({ navigation }) {
       return;
     }
 
-    // Keep selection valid after returning from Group Management.
     const selectedStillExists = nextGroups.some((group) => group.id === selectedGroupId);
     if (!selectedStillExists) {
       setSelectedGroupId('none');
@@ -71,51 +98,108 @@ export default function Explore({ navigation }) {
     setMealType('');
     setPreferences('');
     setIncludeMyPreferences(false);
-    // Reset UI state as well as form values.
     setIsGroupDropdownOpen(false);
+    setIsMealTypeDropdownOpen(false);
+    setHasGenerated(false);
+    setGeneratedRecipes([]);
+  };
+
+  const filterRecipes = (recipes, options = {}) => {
+    const {
+      manualIngredients = [],
+      manualPreferences = [],
+      useProfileIngredients = false,
+      useProfilePreferences = false,
+      checkCookware = true,
+      checkAllergies = true,
+      mealTypeFilter = '',
+    } = options;
+
+    const allSearchIngredients = [
+      ...manualIngredients.map(i => i.toLowerCase()),
+      ...(useProfileIngredients ? myIngredients.map(i => i.toLowerCase()) : [])
+    ];
+    const uniqueSearchIngredients = [...new Set(allSearchIngredients)];
+
+    const allDietaryPrefs = [
+      ...manualPreferences.map(p => p.toLowerCase()),
+      ...(useProfilePreferences ? dietaryPreferences.filter(p => p !== 'None').map(p => p.toLowerCase()) : [])
+    ];
+    const uniqueDietaryPrefs = [...new Set(allDietaryPrefs)];
+
+    const activeAllergies = allergies.filter(a => a !== 'None');
+
+    return recipes.filter(recipe => {
+      // 1. Meal Type Filter
+      if (mealTypeFilter && recipe.mealType !== mealTypeFilter) return false;
+
+      // 2. Cookware Filter (Must have all required cookware)
+      if (checkCookware && recipe.requiredCookware.length > 0) {
+        const hasAllCookware = recipe.requiredCookware.every(rc => 
+          cookingEquipment.includes(rc)
+        );
+        if (!hasAllCookware) return false;
+      }
+
+      // 3. Allergies Filter (Must not contain any user allergens)
+      if (checkAllergies && recipe.allergens.length > 0 && activeAllergies.length > 0) {
+        const hasAllergenMatch = recipe.allergens.some(ra => 
+          activeAllergies.includes(ra)
+        );
+        if (hasAllergenMatch) return false;
+      }
+
+      // 4. Dietary Preferences Filter (Must match ALL set preferences)
+      if (uniqueDietaryPrefs.length > 0) {
+        const recipeTags = recipe.dietaryTags.map(t => t.toLowerCase());
+        const matchesAllPrefs = uniqueDietaryPrefs.every(pref => 
+          recipeTags.includes(pref)
+        );
+        if (!matchesAllPrefs) return false;
+      }
+
+      // 5. Ingredients Matching (only for Generation)
+      if (uniqueSearchIngredients.length > 0) {
+        const matchingIngredients = uniqueSearchIngredients.filter(ui => 
+          recipe.searchIngredients.some(ri => ri.toLowerCase().includes(ui) || ui.includes(ri.toLowerCase()))
+        );
+        if (matchingIngredients.length < 2) return false;
+      }
+
+      return true;
+    });
   };
 
   const handleGenerate = () => {
-    const selectedGroup = groups.find((group) => group.id === selectedGroupId) || null;
-    const groupDietaryPreferences = selectedGroup
-      ? getDietaryPreferencesForUsernames(selectedGroup.members)
-      : [];
+    setIsGenerating(true);
+    setHasGenerated(false);
 
-    const manualPreferences = preferences
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean);
+    // Simulate network delay
+    setTimeout(() => {
+      const manualIngredients = ingredients.split(',').map(i => i.trim()).filter(Boolean);
+      const manualPreferences = preferences.split(',').map(p => p.trim()).filter(Boolean);
 
-    // Merge manual preferences with group-derived preferences, deduping case-insensitively.
-    const mergedPreferences = [...manualPreferences];
-    groupDietaryPreferences.forEach((groupPreference) => {
-      const alreadyIncluded = mergedPreferences.some(
-        (item) => item.toLowerCase() === groupPreference.toLowerCase()
-      );
-      if (!alreadyIncluded) {
-        mergedPreferences.push(groupPreference);
-      }
-    });
+      const matched = filterRecipes(ALL_RECIPES, {
+        manualIngredients,
+        manualPreferences,
+        useProfileIngredients: includeMyIngredients,
+        useProfilePreferences: includeMyPreferences,
+        mealTypeFilter: mealType,
+      });
 
-    const finalPreferences = mergedPreferences.join(', ');
-    if (finalPreferences !== preferences) {
-      // Show users the final preferences that will be used for generation.
-      setPreferences(finalPreferences);
-    }
-
-    // Generate logic here
-    console.log('Generating with:', {
-      ingredients,
-      includeMyIngredients,
-      mealType,
-      preferences: finalPreferences,
-      includeMyPreferences,
-      groupId: selectedGroup ? selectedGroup.id : null,
-      groupName: selectedGroup ? selectedGroup.name : null,
-      groupMembers: selectedGroup ? selectedGroup.members : [],
-      groupDietaryPreferences,
-    });
+      setGeneratedRecipes(matched);
+      setIsGenerating(false);
+      setHasGenerated(true);
+    }, 2500);
   };
+
+  // Explore tab: Only show recipes that fit user's profile (Allergies, Cookware, Global Prefs)
+  const exploreRecipes = filterRecipes(ALL_RECIPES, {
+    useProfilePreferences: true, // Always respect profile preferences on Explore
+    manualIngredients: [], // No ingredient matching on main Explore
+  });
+
+  const isGenerateDisabled = !ingredients.trim() && !(includeMyIngredients && myIngredients.length > 0);
 
   const selectedGroup = groups.find((group) => group.id === selectedGroupId) || null;
   const selectedGroupLabel = selectedGroup
@@ -142,13 +226,16 @@ export default function Explore({ navigation }) {
   );
 
   return (
-    <AppLayout>
+    <AppLayout title="Recipy">
       <View style={styles.container}>
         {/* Tab Navigation */}
         <View style={styles.tabContainer}>
           <TouchableOpacity 
             style={[styles.tabButton, activeTab === 'Explore Recipes' && styles.activeTab]}
-            onPress={() => setActiveTab('Explore Recipes')}
+            onPress={() => {
+              setActiveTab('Explore Recipes');
+              setHasGenerated(false);
+            }}
           >
             <Text style={[styles.tabText, activeTab === 'Explore Recipes' && styles.activeTabText]}>
               Explore Recipes
@@ -167,131 +254,188 @@ export default function Explore({ navigation }) {
         {/* Content Section */}
         {activeTab === 'Explore Recipes' ? (
           <View style={styles.contentContainer}>
-            <Text style={styles.header}>Explore Recipes</Text>
-            <FlatList
-              data={dummyRecipes}
-              keyExtractor={(item) => item.id}
-              renderItem={renderRecipeItem}
-              contentContainerStyle={styles.listContainer}
-            />
+            {exploreRecipes.length > 0 ? (
+              <FlatList
+                data={exploreRecipes}
+                keyExtractor={(item) => item.id}
+                renderItem={renderRecipeItem}
+                contentContainerStyle={styles.listContainer}
+              />
+            ) : (
+              <View style={styles.emptyExploreContainer}>
+                <Text style={styles.emptyExploreText}>
+                  We couldn't find any recipes that match your current profile.
+                </Text>
+                <Text style={styles.emptyExploreSubtext}>
+                  Try adjusting your dietary preferences or cookware in Settings to see more results!
+                </Text>
+                <TouchableOpacity 
+                  style={styles.settingsButton} 
+                  onPress={() => navigation.navigate('Settings')}
+                >
+                  <Text style={styles.settingsButtonText}>Update My Profile</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         ) : (
-          <ScrollView style={styles.contentContainer} contentContainerStyle={styles.formContainer}>
-            <Text style={styles.header}>Generate a Recipe</Text>
-            
-            <Text style={styles.label}>What ingredients do you have?</Text>
-            <TextInput 
-              style={styles.input}
-              placeholder="e.g., Chicken, broccoli, rice..."
-              value={ingredients}
-              onChangeText={setIngredients}
-            />
+          <View style={{ flex: 1 }}>
+            {isGenerating ? (
+              <GeneratingAnimation />
+            ) : hasGenerated ? (
+              <View style={styles.contentContainer}>
+                <View style={styles.resultsHeader}>
+                  <TouchableOpacity onPress={() => setHasGenerated(false)}>
+                    <Text style={styles.backToFormText}>← Edit Preferences</Text>
+                  </TouchableOpacity>
+                </View>
+                {generatedRecipes.length > 0 ? (
+                  <FlatList
+                    data={generatedRecipes}
+                    keyExtractor={(item) => item.id}
+                    renderItem={renderRecipeItem}
+                    contentContainerStyle={styles.listContainer}
+                  />
+                ) : (
+                  <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyText}>No exact matches found, but you can try adjusting your preferences!</Text>
+                    <TouchableOpacity style={styles.retryButton} onPress={() => setHasGenerated(false)}>
+                      <Text style={styles.retryButtonText}>Adjust Settings</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+            ) : (
+              <ScrollView style={styles.contentContainer} contentContainerStyle={styles.formContainer}>
+                <Text style={styles.label}>What ingredients do you have?</Text>
+                <TextInput 
+                  style={styles.input}
+                  placeholder="e.g., Chicken, broccoli, rice..."
+                  value={ingredients}
+                  onChangeText={setIngredients}
+                />
 
-            <TouchableOpacity 
-              style={styles.checkboxRow}
-              activeOpacity={0.7}
-              onPress={() => setIncludeMyIngredients(!includeMyIngredients)}
-            >
-              <Checkbox
-                value={includeMyIngredients}
-                onValueChange={setIncludeMyIngredients}
-                color={includeMyIngredients ? colors.brand : undefined}
-              />
-              <Text style={styles.checkboxLabel}>Include My Ingredients</Text>
-            </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.checkboxRow}
+                  activeOpacity={0.7}
+                  onPress={() => setIncludeMyIngredients(!includeMyIngredients)}
+                >
+                  <Checkbox
+                    value={includeMyIngredients}
+                    onValueChange={setIncludeMyIngredients}
+                    color={includeMyIngredients ? colors.brand : undefined}
+                  />
+                  <Text style={styles.checkboxLabel}>Include My Ingredients</Text>
+                </TouchableOpacity>
 
-            <Text style={styles.label}>Meal Type</Text>
-            <TextInput 
-              style={styles.input}
-              placeholder="e.g., Breakfast, Lunch, Dinner..."
-              value={mealType}
-              onChangeText={setMealType}
-            />
-
-            <Text style={styles.label}>Dietary Preferences / Restrictions</Text>
-            <TextInput 
-              style={[styles.input, styles.textArea]}
-              placeholder="e.g., Vegetarian, low-carb..."
-              value={preferences}
-              onChangeText={setPreferences}
-              multiline
-              numberOfLines={3}
-            />
-
-            <TouchableOpacity 
-              style={styles.checkboxRow}
-              activeOpacity={0.7}
-              onPress={() => setIncludeMyPreferences(!includeMyPreferences)}
-            >
-              <Checkbox
-                value={includeMyPreferences}
-                onValueChange={setIncludeMyPreferences}
-                color={includeMyPreferences ? colors.brand : undefined}
-              />
-              <Text style={styles.checkboxLabel}>Include My Preferences</Text>
-            </TouchableOpacity>
-
-            <Text style={styles.label}>Group For Recipe Generation</Text>
-            <View style={styles.dropdownContainer}>
-              {/* Custom dropdown keeps this control visually aligned with token-styled inputs. */}
-              <TouchableOpacity
-                style={styles.dropdownTrigger}
-                onPress={() => setIsGroupDropdownOpen((previous) => !previous)}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.dropdownTriggerText}>{selectedGroupLabel}</Text>
-                <Text style={styles.dropdownChevron}>{isGroupDropdownOpen ? '▲' : '▼'}</Text>
-              </TouchableOpacity>
-
-              {isGroupDropdownOpen ? (
-                <View style={styles.dropdownMenu}>
+                <Text style={styles.label}>Meal Type</Text>
+                <View style={styles.dropdownContainer}>
                   <TouchableOpacity
-                    style={styles.dropdownItem}
-                    onPress={() => {
-                      setSelectedGroupId('none');
-                      setIsGroupDropdownOpen(false);
-                    }}
+                    style={styles.dropdownTrigger}
+                    onPress={() => setIsMealTypeDropdownOpen(!isMealTypeDropdownOpen)}
+                    activeOpacity={0.8}
                   >
-                    <Text style={styles.dropdownItemText}>None</Text>
+                    <Text style={styles.dropdownTriggerText}>{mealType || 'Select Meal Type'}</Text>
+                    <Text style={styles.dropdownChevron}>{isMealTypeDropdownOpen ? '▲' : '▼'}</Text>
                   </TouchableOpacity>
 
-                  {groups.map((group) => (
-                    <TouchableOpacity
-                      key={group.id}
-                      style={styles.dropdownItem}
-                      onPress={() => {
-                        setSelectedGroupId(group.id);
-                        setIsGroupDropdownOpen(false);
-                      }}
-                    >
-                      <Text style={styles.dropdownItemText}>
-                        {group.name} ({group.members.length})
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                  {isMealTypeDropdownOpen ? (
+                    <View style={styles.dropdownMenu}>
+                      {MEAL_TYPES.map((type) => (
+                        <TouchableOpacity
+                          key={type}
+                          style={styles.dropdownItem}
+                          onPress={() => {
+                            setMealType(type);
+                            setIsMealTypeDropdownOpen(false);
+                          }}
+                        >
+                          <Text style={styles.dropdownItemText}>{type}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  ) : null}
                 </View>
-              ) : null}
-            </View>
-            {groups.length === 0 ? (
-              <Text style={styles.helperText}>
-                No groups yet. Create one in Settings {'>'} Group Management.
-              </Text>
-            ) : null}
-            {selectedGroup && selectedGroupDietaryPreferences.length > 0 ? (
-              <Text style={styles.helperText}>
-                Group dietary preferences that will be added: {selectedGroupDietaryPreferences.join(', ')}
-              </Text>
-            ) : null}
 
-            <View style={styles.formActions}>
-              <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={handleClear}>
-                <Text style={styles.buttonSecondaryText}>Clear</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.button, styles.buttonPrimary]} onPress={handleGenerate}>
-                <Text style={styles.buttonPrimaryText}>Generate Recipe</Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
+                <Text style={styles.label}>Dietary Preferences / Restrictions</Text>
+                <TextInput 
+                  style={[styles.input, styles.textArea]}
+                  placeholder="e.g., Vegetarian, low-carb..."
+                  value={preferences}
+                  onChangeText={setPreferences}
+                  multiline
+                  numberOfLines={3}
+                />
+
+                <TouchableOpacity 
+                  style={styles.checkboxRow}
+                  activeOpacity={0.7}
+                  onPress={() => setIncludeMyPreferences(!includeMyPreferences)}
+                >
+                  <Checkbox
+                    value={includeMyPreferences}
+                    onValueChange={setIncludeMyPreferences}
+                    color={includeMyPreferences ? colors.brand : undefined}
+                  />
+                  <Text style={styles.checkboxLabel}>Include My Preferences</Text>
+                </TouchableOpacity>
+
+                <Text style={styles.label}>Group For Recipe Generation</Text>
+                <View style={styles.dropdownContainer}>
+                  <TouchableOpacity
+                    style={styles.dropdownTrigger}
+                    onPress={() => setIsGroupDropdownOpen((previous) => !previous)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.dropdownTriggerText}>{selectedGroupLabel}</Text>
+                    <Text style={styles.dropdownChevron}>{isGroupDropdownOpen ? '▲' : '▼'}</Text>
+                  </TouchableOpacity>
+
+                  {isGroupDropdownOpen ? (
+                    <View style={styles.dropdownMenu}>
+                      <TouchableOpacity
+                        style={styles.dropdownItem}
+                        onPress={() => {
+                          setSelectedGroupId('none');
+                          setIsGroupDropdownOpen(false);
+                        }}
+                      >
+                        <Text style={styles.dropdownItemText}>None</Text>
+                      </TouchableOpacity>
+
+                      {groups.map((group) => (
+                        <TouchableOpacity
+                          key={group.id}
+                          style={styles.dropdownItem}
+                          onPress={() => {
+                            setSelectedGroupId(group.id);
+                            setIsGroupDropdownOpen(false);
+                          }}
+                        >
+                          <Text style={styles.dropdownItemText}>
+                            {group.name} ({group.members.length})
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  ) : null}
+                </View>
+
+                <View style={styles.formActions}>
+                  <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={handleClear}>
+                    <Text style={styles.buttonSecondaryText}>Clear</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={[styles.button, styles.buttonPrimary, isGenerateDisabled && styles.buttonDisabled]} 
+                    onPress={handleGenerate}
+                    disabled={isGenerateDisabled}
+                  >
+                    <Text style={styles.buttonPrimaryText}>Generate Recipe</Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            )}
+          </View>
         )}
       </View>
     </AppLayout>
@@ -342,10 +486,12 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxxl,
+    paddingTop: spacing.lg,
   },
   formContainer: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxxl,
+    paddingTop: spacing.lg,
   },
   label: {
     fontSize: fontSizes.sm,
@@ -410,12 +556,6 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.md,
     color: colors.textPrimary,
   },
-  helperText: {
-    marginTop: spacing.xs,
-    fontSize: fontSizes.xs,
-    color: colors.textMuted,
-    fontStyle: 'italic',
-  },
   checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -450,6 +590,10 @@ const styles = StyleSheet.create({
     color: colors.surface,
     fontSize: fontSizes.md,
     fontWeight: fontWeights.bold,
+  },
+  buttonDisabled: {
+    backgroundColor: colors.brandLight,
+    opacity: 0.7,
   },
   buttonSecondary: {
     backgroundColor: colors.surface,
@@ -504,5 +648,94 @@ const styles = StyleSheet.create({
     borderRadius: radii.sm,
     alignSelf: 'flex-start',
     overflow: 'hidden',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xxl,
+  },
+  spinner: {
+    width: 50,
+    height: 50,
+    borderWidth: 4,
+    borderColor: colors.brand,
+    borderTopColor: 'transparent',
+    borderRadius: 25,
+    marginBottom: spacing.xl,
+  },
+  loadingText: {
+    fontSize: fontSizes.lg,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    fontWeight: fontWeights.medium,
+  },
+  resultsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingRight: spacing.lg,
+    paddingVertical: spacing.md,
+    paddingLeft: spacing.lg,
+  },
+  backToFormText: {
+    color: colors.brand,
+    fontWeight: fontWeights.bold,
+    fontSize: fontSizes.sm,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xxl,
+  },
+  emptyText: {
+    fontSize: fontSizes.lg,
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginBottom: spacing.xl,
+  },
+  retryButton: {
+    backgroundColor: colors.brand,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    borderRadius: radii.md,
+  },
+  retryButtonText: {
+    color: colors.surface,
+    fontWeight: fontWeights.bold,
+  },
+  emptyExploreContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xxxl,
+    marginTop: spacing.xxxl,
+  },
+  emptyExploreText: {
+    fontSize: fontSizes.xl,
+    fontWeight: fontWeights.bold,
+    color: colors.textPrimary,
+    textAlign: 'center',
+    marginBottom: spacing.md,
+  },
+  emptyExploreSubtext: {
+    fontSize: fontSizes.md,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: spacing.xxxl,
+    lineHeight: 24,
+  },
+  settingsButton: {
+    backgroundColor: colors.brand,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xxl,
+    borderRadius: radii.lg,
+    ...shadows.md,
+  },
+  settingsButtonText: {
+    color: colors.surface,
+    fontSize: fontSizes.md,
+    fontWeight: fontWeights.bold,
   },
 });
