@@ -3,11 +3,13 @@ import {
   View,
   TouchableOpacity,
   Image,
+  Text,
   StyleSheet,
 } from 'react-native';
 import { useNavigation, useNavigationState } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, shadows } from '../design/tokens';
+import { Ionicons } from '@expo/vector-icons';
+import { colors, spacing, shadows, fontSizes, fontWeights } from '../design/tokens';
 import { AppContext } from '../context/AppContext';
 
 export default function BottomNav() {
@@ -27,29 +29,31 @@ export default function BottomNav() {
     }
   };
 
+  const isHomeActive = activeRoute === 'Explore' || activeRoute === 'RecipeDetails';
+
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom || spacing.sm }]}>
 
       <TouchableOpacity style={styles.tab} onPress={handleHomePress}>
         <Image
           source={
-            activeRoute === 'Explore' || activeRoute === 'RecipeDetails'
+            isHomeActive
               ? require('../assets/HomeActive.png')
               : require('../assets/Home.png')
           }
           style={styles.icon}
         />
+        <Text style={[styles.tabLabel, isHomeActive && styles.activeTabLabel]}>Home</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('MyIngredients')}>
-        <Image
-          source={
-            activeRoute === 'MyIngredients'
-              ? require('../assets/IngredientsActive.png')
-              : require('../assets/Ingredients.png')
-          }
-          style={styles.icon}
+        <Ionicons 
+          name={activeRoute === 'MyIngredients' ? 'list' : 'list-outline'} 
+          size={26} 
+          color={activeRoute === 'MyIngredients' ? colors.brand : colors.textMuted}
+          style={{ marginBottom: 4 }}
         />
+        <Text style={[styles.tabLabel, activeRoute === 'MyIngredients' && styles.activeTabLabel]}>Ingredients</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('SavedRecipes')}>
@@ -61,6 +65,7 @@ export default function BottomNav() {
           }
           style={styles.icon}
         />
+        <Text style={[styles.tabLabel, activeRoute === 'SavedRecipes' && styles.activeTabLabel]}>Saved</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('Settings')}>
@@ -72,6 +77,7 @@ export default function BottomNav() {
           }
           style={styles.icon}
         />
+        <Text style={[styles.tabLabel, activeRoute === 'Settings' && styles.activeTabLabel]}>Settings</Text>
       </TouchableOpacity>
 
     </View>
@@ -86,21 +92,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
-    paddingTop: spacing.sm,
+    paddingTop: spacing.xs,
     ...shadows.md,
     elevation: 10,
   },
 
   tab: {
-    padding: spacing.sm,
+    padding: spacing.xs,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   icon: {
-    width: 28,
-    height: 28,
+    width: 26,
+    height: 26,
     resizeMode: 'contain',
+    marginBottom: 4,
+  },
+
+  tabLabel: {
+    fontSize: fontSizes.xs - 2,
+    color: colors.textMuted,
+    fontWeight: fontWeights.medium,
+  },
+
+  activeTabLabel: {
+    color: colors.brand,
+    fontWeight: fontWeights.bold,
   },
 });
