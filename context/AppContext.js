@@ -9,6 +9,8 @@ export const AppProvider = ({ children }) => {
   const [cookingEquipment, setCookingEquipment] = useState([]);
   const [myIngredients, setMyIngredients] = useState([]);
   const [savedRecipes, setSavedRecipes] = useState([]);
+  const [lastVisitedRecipeId, setLastVisitedRecipeId] = useState(null);
+  const [goal, setGoal] = useState('');
 
   const resetApp = () => {
     setUsername('');
@@ -17,6 +19,8 @@ export const AppProvider = ({ children }) => {
     setCookingEquipment([]);
     setMyIngredients([]);
     setSavedRecipes([]);
+    setLastVisitedRecipeId(null);
+    setGoal('');
   };
 
   return (
@@ -27,6 +31,8 @@ export const AppProvider = ({ children }) => {
       cookingEquipment, setCookingEquipment,
       myIngredients, setMyIngredients,
       savedRecipes, setSavedRecipes,
+      lastVisitedRecipeId, setLastVisitedRecipeId,
+      goal, setGoal,
       resetApp,
     }}>
       {children}

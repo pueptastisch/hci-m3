@@ -8,22 +8,32 @@ import {
 import { useNavigation, useNavigationState } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, shadows } from '../design/tokens';
+import { AppContext } from '../context/AppContext';
 
 export default function BottomNav() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const { lastVisitedRecipeId } = React.useContext(AppContext);
 
   const activeRoute = useNavigationState(
-    state => state.routes[state.index].name
+    state => state ? state.routes[state.index].name : 'Explore'
   );
+
+  const handleHomePress = () => {
+    if (activeRoute !== 'RecipeDetails' && lastVisitedRecipeId) {
+      navigation.navigate('RecipeDetails', { recipeId: lastVisitedRecipeId });
+    } else {
+      navigation.navigate('Explore');
+    }
+  };
 
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom || spacing.sm }]}>
 
-      <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('Explore')}>
+      <TouchableOpacity style={styles.tab} onPress={handleHomePress}>
         <Image
           source={
-            activeRoute === 'Explore'
+            activeRoute === 'Explore' || activeRoute === 'RecipeDetails'
               ? require('../assets/HomeActive.png')
               : require('../assets/Home.png')
           }

@@ -32,7 +32,7 @@ export default function Welcome({ navigation }) {
   const handleContinue = () => {
     if (name.trim()) {
       setUsername(name.trim());
-      navigation.navigate('DietaryPreferences');
+      navigation.navigate('GoalSelection');
     }
   };
 
@@ -156,10 +156,12 @@ const styles = StyleSheet.create({
     ...shadows.md,
   },
   buttonDisabled: {
-    backgroundColor: colors.brandLight,
+    backgroundColor: '#CFF7D3',
+    borderWidth: 1,
+    borderColor: colors.brand,
   },
   buttonText: {
-    color: colors.surface,
+    color: colors.textPrimary,
     fontSize: fontSizes.lg,
     fontWeight: fontWeights.bold,
   },

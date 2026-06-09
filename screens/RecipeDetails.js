@@ -20,8 +20,12 @@ export default function RecipeDetails({ route }) {
 
   const [activeTab, setActiveTab] = useState('Ingredients');
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const { savedRecipes, setSavedRecipes } = useContext(AppContext);
+  const { savedRecipes, setSavedRecipes, setLastVisitedRecipeId } = useContext(AppContext);
   
+  React.useEffect(() => {
+    setLastVisitedRecipeId(recipeId);
+  }, [recipeId, setLastVisitedRecipeId]);
+
   if (!recipe) {
     return (
       <AppLayout>
@@ -94,6 +98,17 @@ export default function RecipeDetails({ route }) {
           </View>
           <Text style={styles.title}>{recipe.title}</Text>
           <Text style={styles.description}>{recipe.description}</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoText}>Difficulty: {recipe.difficulty}</Text>
+            <View style={styles.dot} />
+            <Text style={styles.infoText}>{recipe.calories} kcal</Text>
+            {recipe.isHealthy && (
+              <>
+                <View style={styles.dot} />
+                <Text style={[styles.infoText, { color: '#15803d', fontWeight: 'bold' }]}>Healthy</Text>
+              </>
+            )}
+          </View>
         </View>
 
         {/* Tab Buttons */}
@@ -224,6 +239,24 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.md,
     color: colors.textMuted,
     textAlign: 'center',
+    marginBottom: spacing.md,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: spacing.sm,
+  },
+  infoText: {
+    fontSize: fontSizes.sm,
+    color: colors.textSecondary,
+  },
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.textDisabled,
+    marginHorizontal: spacing.sm,
   },
   tabContainer: {
     flexDirection: 'row',

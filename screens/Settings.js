@@ -44,6 +44,13 @@ export default function Settings({ navigation }) {
 
           <TouchableOpacity 
             style={styles.item} 
+            onPress={() => navigation.navigate('GoalSelection', { fromSettings: true })}
+          >
+            <Text style={styles.itemText}>My Goal</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.item} 
             onPress={() => navigation.navigate('DietaryPreferences', { fromSettings: true })}
           >
             <Text style={styles.itemText}>Dietary Preferences</Text>
@@ -92,6 +99,13 @@ export default function Settings({ navigation }) {
             <Text style={[styles.itemText, { color: colors.danger }]}>Log Out</Text>
           </TouchableOpacity>
         </View>
+
+        <View style={styles.supportSection}>
+          <Text style={styles.supportText}>
+            Have issues or questions? Contact us at{' '}
+            <Text style={styles.supportEmail}>support@reci.py</Text>
+          </Text>
+        </View>
       </ScrollView>
     </AppLayout>
   );
@@ -127,5 +141,21 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.lg,
     color: colors.textPrimary,
     fontWeight: fontWeights.medium,
+  },
+  supportSection: {
+    marginTop: spacing.xl,
+    marginBottom: spacing.xxxl,
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+  },
+  supportText: {
+    fontSize: fontSizes.sm,
+    color: colors.textMuted,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  supportEmail: {
+    color: colors.brand,
+    fontWeight: fontWeights.bold,
   },
 });

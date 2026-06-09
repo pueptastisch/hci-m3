@@ -49,8 +49,14 @@ const GeneratingAnimation = () => {
 
 export default function Explore({ navigation }) {
   const [activeTab, setActiveTab] = useState('Explore Recipes');
-  const { myIngredients, dietaryPreferences, allergies, cookingEquipment } = useContext(AppContext);
+  const { myIngredients, dietaryPreferences, allergies, cookingEquipment, setLastVisitedRecipeId, goal } = useContext(AppContext);
   
+  useFocusEffect(
+    useCallback(() => {
+      setLastVisitedRecipeId(null);
+    }, [setLastVisitedRecipeId])
+  );
+
   // Generate Form State
   const [ingredients, setIngredients] = useState('');
   const [includeMyIngredients, setIncludeMyIngredients] = useState(false);
@@ -113,6 +119,7 @@ export default function Explore({ navigation }) {
       checkCookware = true,
       checkAllergies = true,
       mealTypeFilter = '',
+      checkHealthy = true,
     } = options;
 
     const allSearchIngredients = [
@@ -130,6 +137,9 @@ export default function Explore({ navigation }) {
     const activeAllergies = allergies.filter(a => a !== 'None');
 
     return recipes.filter(recipe => {
+      // 0. Healthy Filter (if goal is Healthy Eating)
+      if (checkHealthy && goal === 'Healthy Eating' && !recipe.isHealthy) return false;
+
       // 1. Meal Type Filter
       if (mealTypeFilter && recipe.mealType !== mealTypeFilter) return false;
 
@@ -220,7 +230,11 @@ export default function Explore({ navigation }) {
         <Text style={styles.description} numberOfLines={2}>
           {item.description}
         </Text>
-        <Text style={styles.difficulty}>Difficulty: {item.difficulty}</Text>
+        <View style={styles.badgeRow}>
+          <Text style={styles.difficulty}>Difficulty: {item.difficulty}</Text>
+          {item.isHealthy && <Text style={styles.healthyBadge}>Healthy</Text>}
+          <Text style={styles.caloriesBadge}>{item.calories} kcal</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -646,7 +660,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: radii.sm,
-    alignSelf: 'flex-start',
+    overflow: 'hidden',
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    flexWrap: 'wrap',
+  },
+  healthyBadge: {
+    fontSize: fontSizes.xs,
+    fontWeight: fontWeights.medium,
+    color: '#15803d',
+    backgroundColor: '#dcfce7',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.sm,
+    overflow: 'hidden',
+  },
+  caloriesBadge: {
+    fontSize: fontSizes.xs,
+    fontWeight: fontWeights.medium,
+    color: colors.textMuted,
+    backgroundColor: '#f1f5f9',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.sm,
     overflow: 'hidden',
   },
   loadingContainer: {

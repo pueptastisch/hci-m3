@@ -1,47 +1,37 @@
-## Readme - M3
+## Readme - M4
 
-* Gruppe:	2
+* Group:	2
 * Team-Nr.: 210
-* Projektthema: Recipe Generator 
+* Project: Recipe Generator 
 
-### Implementierung
+### Implementation
 
 Framework:	React Native, Expo
 
 API-Version:	36
 
-Geräte, auf dem(denen) getestet wurde:
+Test devices:
 Pixel 6 in android studio, Chrome Web browser mit pixel 7 view
 
-Externe Libraries und Frameworks:
+External Libraries and Frameworks:
 expo, react native
 
-Dauer der Entwicklung:
-20h
-
-## Weitere Anmerkungen:
+Development time:
+12h
 
 ### Build & Run
 
 1. `npm install`
-2. `npm run android`
+2. `npm run android` or `npm start`
 
-### KI-Nutzung:
+### AI-Usage:
 
-- Generieren von code blöcken mit copilot (model auto selection, oft gpt 5.3 codex oder gemini 3.1)
-- Komplette Agentic implementierung der Group Management logik mit spec driven development
-- refactor nach einführung der design tokens (alle abstände und Farben die vorher individuell waren durch die design tokens ersetzt)
-- Hilfe beim Debuggen (Fehlermeldungen)
-- Unterstützung bei Checkbox-Logik (früher wurden alle Checkboxen aktiviert, obwohl nur eine ausgewählt wurde)
-- Hilfe bei der Navigation innerhalb der App (z. B. wie man von „Preferences“ bzw. „Allergies“ zurück zu „Settings“ gelangt)
-- Unterstützung bei der Suche nach features bzw. Libraries (z. b Checkbox)
+- Agentic development with tools like Github Copilot and Gemini CLI (both with gemini-3.1 flash)
+- Links to images
+- Creating predefined recipes 
 
 Prompts:
-- Generische prompt: "Provide a skeleton for \<page name\> that will include \<data\>, \<functionality\>"
-- Meistens benutzt "\[ERROR LOG: error message\]"
-
-### Arbeitsverteilung:
-- Ahmed Alhalabi (Setup, Allergies, CookingEquipment, DietaryPreferences, MyIngredients, Settings)
-- Nicol Weghofer (Design tokens, Collaborative Group Management, README, Settings, Generate)
-- Zahra Sadeghi (Prototypenbeschreibung)
-- Dinmukhamed Zhakhan (Explore, RecipeDetails, SavedRecipes, Generate)
+- "I need to add \<functionality\> to the \<screen\>, so it will \<goal\>" 
+- "Lets make the fonts smaller and consistent across the app"
+- "Create recipes to cover listed preferences and allergies"
+- "Add healthy tag and calory information to each recipe to display near difficulty"
