@@ -34,4 +34,4 @@ Prompts:
 - "I need to add \<functionality\> to the \<screen\>, so it will \<goal\>" 
 - "Lets make the fonts smaller and consistent across the app"
 - "Create recipes to cover listed preferences and allergies"
-- "Add healthy tag and calory information to each recipe to display near difficulty"
+- "Add healthy tag and calorie information to each recipe to display near difficulty"
