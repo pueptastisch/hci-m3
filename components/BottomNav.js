@@ -3,32 +3,46 @@ import {
   View,
   TouchableOpacity,
   Image,
+  Text,
   StyleSheet,
 } from 'react-native';
 import { useNavigation, useNavigationState } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, shadows } from '../design/tokens';
+import { colors, spacing, shadows, fontSizes, fontWeights } from '../design/tokens';
+import { AppContext } from '../context/AppContext';
 
 export default function BottomNav() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const { lastVisitedRecipeId } = React.useContext(AppContext);
 
   const activeRoute = useNavigationState(
-    state => state.routes[state.index].name
+    state => state ? state.routes[state.index].name : 'Explore'
   );
+
+  const handleHomePress = () => {
+    if (activeRoute !== 'RecipeDetails' && lastVisitedRecipeId) {
+      navigation.navigate('RecipeDetails', { recipeId: lastVisitedRecipeId });
+    } else {
+      navigation.navigate('Explore');
+    }
+  };
+
+  const isHomeActive = activeRoute === 'Explore' || activeRoute === 'RecipeDetails';
 
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom || spacing.sm }]}>
 
-      <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('Explore')}>
+      <TouchableOpacity style={styles.tab} onPress={handleHomePress}>
         <Image
           source={
-            activeRoute === 'Explore'
+            isHomeActive
               ? require('../assets/HomeActive.png')
               : require('../assets/Home.png')
           }
           style={styles.icon}
         />
+        <Text style={[styles.tabLabel, isHomeActive && styles.activeTabLabel]}>Home</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('MyIngredients')}>
@@ -40,6 +54,7 @@ export default function BottomNav() {
           }
           style={styles.icon}
         />
+        <Text style={[styles.tabLabel, activeRoute === 'MyIngredients' && styles.activeTabLabel]}>Ingredients</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('SavedRecipes')}>
@@ -51,6 +66,7 @@ export default function BottomNav() {
           }
           style={styles.icon}
         />
+        <Text style={[styles.tabLabel, activeRoute === 'SavedRecipes' && styles.activeTabLabel]}>Saved</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate('Settings')}>
@@ -62,6 +78,7 @@ export default function BottomNav() {
           }
           style={styles.icon}
         />
+        <Text style={[styles.tabLabel, activeRoute === 'Settings' && styles.activeTabLabel]}>Settings</Text>
       </TouchableOpacity>
 
     </View>
@@ -76,21 +93,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
-    paddingTop: spacing.sm,
+    paddingTop: spacing.xs,
     ...shadows.md,
     elevation: 10,
   },
 
   tab: {
-    padding: spacing.sm,
+    padding: spacing.xs,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   icon: {
-    width: 28,
-    height: 28,
+    width: 26,
+    height: 26,
     resizeMode: 'contain',
+    marginBottom: 4,
+  },
+
+  tabLabel: {
+    fontSize: fontSizes.xs - 2,
+    color: colors.textMuted,
+    fontWeight: fontWeights.medium,
+  },
+
+  activeTabLabel: {
+    color: colors.brand,
+    fontWeight: fontWeights.bold,
   },
 });

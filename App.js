@@ -12,6 +12,7 @@ import Settings from './screens/Settings';
 import CookingEquipment from './screens/CookingEquipment';
 import GroupManagement from './screens/GroupManagement';
 import Welcome from './screens/Welcome';
+import GoalSelection from './screens/GoalSelection';
 import Subscription from './screens/Subscription';
 import PaymentInfo from './screens/PaymentInfo';
 import { AppProvider } from './context/AppContext';
@@ -30,6 +31,10 @@ export default function App() {
         <Stack.Screen
           name="Welcome"
           component={Welcome}
+        />
+        <Stack.Screen
+          name="GoalSelection"
+          component={GoalSelection}
         />
         <Stack.Screen
           name="DietaryPreferences"

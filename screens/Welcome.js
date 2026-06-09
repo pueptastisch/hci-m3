@@ -32,7 +32,7 @@ export default function Welcome({ navigation }) {
   const handleContinue = () => {
     if (name.trim()) {
       setUsername(name.trim());
-      navigation.navigate('DietaryPreferences');
+      navigation.navigate('GoalSelection');
     }
   };
 

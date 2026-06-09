@@ -133,6 +133,13 @@ export default function GroupManagement({ navigation }) {
   return (
     <AppLayout title="Group Management">
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        
+        <View style={styles.instructionBlock}>
+          <Text style={styles.instructionText}>
+            Create groups to generate recipe recommendations that satisfy everyone's dietary needs. 
+            Simply add friends by their username to include their profile in your group recommendations.
+          </Text>
+        </View>
 
         <Text style={styles.sectionTitle}>Create Group</Text>
         <TextInput
@@ -222,6 +229,20 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.xl,
     paddingBottom: spacing.xxxl,
+  },
+  instructionBlock: {
+    backgroundColor: '#f0f9ff',
+    padding: spacing.md,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: '#bae6fd',
+    marginBottom: spacing.lg,
+  },
+  instructionText: {
+    fontSize: fontSizes.md,
+    color: '#0369a1',
+    lineHeight: 20,
+    textAlign: 'center',
   },
   header: {
     fontSize: fontSizes.display,
